@@ -214,6 +214,35 @@ final class AppState: ObservableObject {
         }
     }
 
+    func handleDoubleClap() {
+        guard tonyStarkMode else { return }
+        print("[SlapSound] DOUBLE CLAP in Tony Stark Mode — opening Terminal + Claude Code + Iron Man music!")
+
+        // 1. Open Terminal and launch Claude Code
+        let terminalScript = """
+        tell application "Terminal"
+            activate
+            do script "claude"
+        end tell
+        """
+        if let script = NSAppleScript(source: terminalScript) {
+            var error: NSDictionary?
+            script.executeAndReturnError(&error)
+            if let error = error {
+                print("[SlapSound] AppleScript error: \(error)")
+            }
+        }
+
+        // 2. Open Iron Man soundtrack in browser
+        let ironManURL = "https://www.youtube.com/watch?v=IyR25B-IGyg&list=RDIyR25B-IGyg&start_radio=1"
+        if let url = URL(string: ironManURL) {
+            NSWorkspace.shared.open(url)
+        }
+
+        // 3. Play the J.A.R.V.I.S. startup sound
+        audioPlayer.playJarvisStartup()
+    }
+
     deinit {
         reader.stop()
         audioPlayer.stop()
@@ -232,6 +261,12 @@ final class SlapBridge: SlapDetectorDelegate {
     func slapDetector(_ detector: SlapDetector, didDetectSlap event: SlapEvent) {
         DispatchQueue.main.async { [weak self] in
             self?.appState?.handleSlap(event)
+        }
+    }
+
+    func slapDetectorDidDetectDoubleClap(_ detector: SlapDetector) {
+        DispatchQueue.main.async { [weak self] in
+            self?.appState?.handleDoubleClap()
         }
     }
 }

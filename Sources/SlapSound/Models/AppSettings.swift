@@ -7,6 +7,7 @@ enum SoundMode: String, CaseIterable, Identifiable {
     case slap = "Slap"
     case punch = "Punch"
     case airHorn = "Air Horn"
+    case moan = "Sussy UwU"
     case custom = "Custom"
 
     var id: String { rawValue }
@@ -16,6 +17,7 @@ enum SoundMode: String, CaseIterable, Identifiable {
         case .slap: return "hand.raised.fill"
         case .punch: return "figure.boxing"
         case .airHorn: return "megaphone.fill"
+        case .moan: return "face.smiling.inverse"
         case .custom: return "music.note"
         }
     }

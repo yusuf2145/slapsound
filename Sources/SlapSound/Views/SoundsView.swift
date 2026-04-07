@@ -134,6 +134,7 @@ struct SoundCard: View {
         case .slap: return [.pink, .purple]
         case .punch: return [.red, .orange]
         case .airHorn: return [.yellow, .orange]
+        case .moan: return [.pink, .red]
         case .custom: return [.blue, .purple]
         }
     }

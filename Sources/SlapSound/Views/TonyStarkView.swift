@@ -234,7 +234,7 @@ struct TonyStarkView: View {
                         .tracking(1.5)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    HStack(spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)], spacing: 16) {
                         FeatureCard(
                             icon: "speaker.wave.3.fill",
                             title: "J.A.R.V.I.S. Sounds",
@@ -246,6 +246,12 @@ struct TonyStarkView: View {
                             title: "Startup Sound",
                             description: "Plays an arc reactor power-up sequence when activated",
                             color: .red
+                        )
+                        FeatureCard(
+                            icon: "hands.clap.fill",
+                            title: "Double Clap",
+                            description: "Clap twice to open Terminal with Claude Code + play Iron Man soundtrack",
+                            color: .orange
                         )
                         FeatureCard(
                             icon: "bolt.fill",

@@ -2,6 +2,7 @@ import Foundation
 
 protocol SlapDetectorDelegate: AnyObject {
     func slapDetector(_ detector: SlapDetector, didDetectSlap event: SlapEvent)
+    func slapDetectorDidDetectDoubleClap(_ detector: SlapDetector)
 }
 
 final class SlapDetector: AccelerometerReaderDelegate {
@@ -38,6 +39,11 @@ final class SlapDetector: AccelerometerReaderDelegate {
     private var peakSample: AccelerometerSample?
     private var inImpact = false
     private var impactStartTime: Date = .distantPast
+
+    // Double-clap detection
+    private var recentSlapTimes: [Date] = []
+    private let doubleClapWindow: TimeInterval = 0.6  // 600ms window for double clap
+    private var lastDoubleClapTime: Date = .distantPast
 
     // Debug logging
     private var logCounter: Int = 0
@@ -115,6 +121,20 @@ final class SlapDetector: AccelerometerReaderDelegate {
 
             let event = SlapEvent(force: force, timestamp: now)
             delegate?.slapDetector(self, didDetectSlap: event)
+
+            // Double-clap detection
+            recentSlapTimes.append(now)
+            // Keep only slaps within the window
+            recentSlapTimes = recentSlapTimes.filter { now.timeIntervalSince($0) < doubleClapWindow }
+            if recentSlapTimes.count >= 2 {
+                let timeSinceLastDouble = now.timeIntervalSince(lastDoubleClapTime)
+                if timeSinceLastDouble > 1.5 { // prevent rapid re-trigger
+                    lastDoubleClapTime = now
+                    recentSlapTimes.removeAll()
+                    print("[SlapSound] *** DOUBLE CLAP DETECTED! ***")
+                    delegate?.slapDetectorDidDetectDoubleClap(self)
+                }
+            }
 
             peakExcess = 0
             peakSample = nil

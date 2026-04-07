@@ -38,7 +38,7 @@ final class AudioPlayer {
 
     private func loadAllSounds(format: AVAudioFormat) {
         // Try to load each sound file
-        let soundNames = ["whipcrack", "slap", "punch", "airhorn", "jarvis", "jarvis_welcome"]
+        let soundNames = ["whipcrack", "slap", "punch", "airhorn", "moan", "jarvis", "jarvis_welcome"]
         let extensions = ["mp3", "wav", "m4a"]
 
         for name in soundNames {
@@ -113,6 +113,7 @@ final class AudioPlayer {
         case .slap: currentSoundKey = "slap"
         case .punch: currentSoundKey = "punch"
         case .airHorn: currentSoundKey = "airhorn"
+        case .moan: currentSoundKey = "moan"
         case .custom: currentSoundKey = "whipcrack" // fallback
         }
         print("[SlapSound] Sound set to: \(currentSoundKey) (has buffer: \(soundBuffers[currentSoundKey] != nil))")
@@ -127,6 +128,7 @@ final class AudioPlayer {
         case .slap: key = "slap"
         case .punch: key = "punch"
         case .airHorn: key = "airhorn"
+        case .moan: key = "moan"
         case .custom: key = "whipcrack"
         }
         guard let buffer = soundBuffers[key] else {
