@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlapSound — Slap Your MacBook, Hear It Scream</title>
+    <meta name="description" content="SlapSound plays whip cracks, slaps, air horns, and more when you physically slap your MacBook. Tony Stark mode included.">
+    <meta property="og:title" content="SlapSound">
+    <meta property="og:description" content="Slap your MacBook. Hear it scream. Tony Stark mode included.">
+    <meta property="og:image" content="assets/icon.jpg">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/icon.jpg">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --orange: #FF6B2C;
+            --red: #FF2D55;
+            --dark: #0A0A0F;
+            --darker: #050508;
+            --card: rgba(255,255,255,0.04);
+            --card-border: rgba(255,255,255,0.08);
+            --text: #F5F5F7;
+            --text-secondary: rgba(255,255,255,0.55);
+            --cyan: #00D4FF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Hero section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(ellipse, rgba(255,107,44,0.15) 0%, rgba(255,45,85,0.08) 40%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-icon {
+            width: 160px;
+            height: 160px;
+            border-radius: 36px;
+            box-shadow: 0 20px 60px rgba(255,107,44,0.3), 0 0 120px rgba(255,107,44,0.1);
+            margin-bottom: 2rem;
+            animation: float 4s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .tagline {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--text-secondary);
+            max-width: 550px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 2rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            color: white;
+            box-shadow: 0 8px 30px rgba(255,107,44,0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255,107,44,0.4);
+        }
+
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--card-border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Section base */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--orange);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+
+        /* Features grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Sound packs section */
+        .sounds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .sound-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .sound-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .sound-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .sound-card h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .sound-card span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Tony Stark section */
+        .tony-section {
+            background: linear-gradient(180deg, rgba(255,45,85,0.05) 0%, transparent 100%);
+            border-top: 1px solid rgba(255,45,85,0.1);
+            padding: 6rem 2rem;
+        }
+
+        .tony-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .tony-card {
+            background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(20,0,0,0.6));
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 24px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .reactor {
+            flex-shrink: 0;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid rgba(0,212,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(0,212,255,0.2), inset 0 0 30px rgba(0,212,255,0.1); }
+            50% { box-shadow: 0 0 60px rgba(0,212,255,0.4), inset 0 0 40px rgba(0,212,255,0.2); }
+        }
+
+        .reactor::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, var(--cyan), transparent);
+            border-radius: 50%;
+        }
+
+        .tony-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--cyan);
+        }
+
+        .tony-info p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .tony-features {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tony-feat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(0,212,255,0.8);
+        }
+
+        /* Install section */
+        .install-section {
+            text-align: center;
+        }
+
+        .code-block {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: left;
+            max-width: 650px;
+            margin: 0 auto 2rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block .comment { color: rgba(255,255,255,0.3); }
+        .code-block .cmd { color: var(--orange); }
+
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: var(--text);
+        }
+
+        /* Requirements */
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .req-item {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .req-item .req-icon {
+            font-size: 1.5rem;
+        }
+
+        .req-item .req-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .req-item .req-text strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--orange);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tony-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+            .tony-features {
+                justify-content: center;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <img src="assets/icon.jpg" alt="SlapSound Icon" class="hero-icon">
+    <h1>Slap Your Mac.<br><span class="gradient">Hear It Scream.</span></h1>
+    <p class="tagline">SlapSound turns your MacBook into a sound machine. Slap it, and it plays whip cracks, air horns, moans, or J.A.R.V.I.S. beeps. Volume scales with force. Tony Stark mode included.</p>
+    <div class="hero-buttons">
+        <a href="https://github.com/yusuf2145/slapsound" class="btn btn-primary">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Download on GitHub
+        </a>
+        <a href="#install" class="btn btn-secondary">
+            Quick Install
+        </a>
+    </div>
+    <div class="scroll-hint">Scroll to explore</div>
+</section>
+
+<!-- Features -->
+<section id="features">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need to slap.</h2>
+    <p class="section-subtitle">Built-in accelerometer detection, multiple sound packs, customizable key bindings, and a mode that would make Tony Stark proud.</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(255,107,44,0.15), rgba(255,45,85,0.1));">
+                <span style="font-size:1.5rem;">&#9889;</span>
+            </div>
+            <h3>Accelerometer Detection</h3>
+            <p>Reads your MacBook's built-in IMU at 800Hz via IOKit HID. Detects impacts with peak-tracking and STA/LTA seismology algorithms.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.1));">
+                <span style="font-size:1.5rem;">&#127925;</span>
+            </div>
+            <h3>6 Sound Packs</h3>
+            <p>Whip Crack, Slap, Punch, Air Horn, Sussy UwU, and Custom. Each with a preview button. Volume and pitch scale with impact force.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(59,130,246,0.1));">
+                <span style="font-size:1.5rem;">&#9889;</span>
+            </div>
+            <h3>Tony Stark Mode</h3>
+            <p>Activate J.A.R.V.I.S. sounds. Double-clap opens Terminal with Claude Code and plays Iron Man soundtrack. Arc reactor UI included.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.1));">
+                <span style="font-size:1.5rem;">&#9000;</span>
+            </div>
+            <h3>Custom Key Binds</h3>
+            <p>Map any key to trigger on slap. Presets for 1, 2, 3, Space, Return, or record any custom key. Simulated via CGEvent.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(22,163,74,0.1));">
+                <span style="font-size:1.5rem;">&#127911;</span>
+            </div>
+            <h3>Force-Scaled Audio</h3>
+            <p>Harder slaps play louder with higher pitch. Logarithmic volume scaling and dynamic pitch shifting via AVAudioEngine.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.1));">
+                <span style="font-size:1.5rem;">&#128200;</span>
+            </div>
+            <h3>Live Dashboard</h3>
+            <p>Real-time slap counter, force meter, recent activity feed, animated impact visualization with ripple effects.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Sound Packs -->
+<section>
+    <div class="section-label">Sound Packs</div>
+    <h2 class="section-title">Pick your weapon.</h2>
+    <p class="section-subtitle">Six built-in sound modes. Preview each one in the app. Or bring your own.</p>
+
+    <div class="sounds-grid">
+        <div class="sound-card">
+            <span class="sound-emoji">&#128165;</span>
+            <h4>Whip Crack</h4>
+            <span>The classic</span>
+        </div>
+        <div class="sound-card">
+            <span class="sound-emoji">&#9995;</span>
+            <h4>Slap</h4>
+            <span>Face slap</span>
+        </div>
+        <div class="sound-card">
+            <span class="sound-emoji">&#129354;</span>
+            <h4>Punch</h4>
+            <span>Boxing hit</span>
+        </div>
+        <div class="sound-card">
+            <span class="sound-emoji">&#128227;</span>
+            <h4>Air Horn</h4>
+            <span>MLG classic</span>
+        </div>
+        <div class="sound-card">
+            <span class="sound-emoji">&#128563;</span>
+            <h4>Sussy UwU</h4>
+            <span>You know</span>
+        </div>
+        <div class="sound-card">
+            <span class="sound-emoji">&#127925;</span>
+            <h4>Custom</h4>
+            <span>Your own MP3</span>
+        </div>
+    </div>
+</section>
+
+<!-- Tony Stark -->
+<div class="tony-section">
+    <div class="tony-inner">
+        <div class="section-label" style="color: var(--cyan);">Special Mode</div>
+        <h2 class="section-title">Tony Stark Mode</h2>
+        <p class="section-subtitle">Transform your MacBook into J.A.R.V.I.S. One toggle activates the full experience.</p>
+
+        <div class="tony-card">
+            <div class="reactor"></div>
+            <div class="tony-info">
+                <h3>J.A.R.V.I.S. ONLINE</h3>
+                <p>Activate Tony Stark Mode and your MacBook becomes an arc reactor. Every slap triggers a sci-fi beep. Double-clap opens Terminal with Claude Code and plays the Iron Man soundtrack on YouTube. Complete with animated arc reactor visualization.</p>
+                <div class="tony-features">
+                    <div class="tony-feat">
+                        <span>&#128266;</span> J.A.R.V.I.S. sounds
+                    </div>
+                    <div class="tony-feat">
+                        <span>&#128079;</span> Double-clap actions
+                    </div>
+                    <div class="tony-feat">
+                        <span>&#127916;</span> Iron Man music
+                    </div>
+                    <div class="tony-feat">
+                        <span>&#128187;</span> Opens Claude Code
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Install -->
+<section class="install-section" id="install">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title">Install in 30 seconds.</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">Clone, build, slap. That's it.</p>
+
+    <div class="code-block">
+        <button class="copy-btn" onclick="copyCode()">Copy</button>
+        <span class="comment"># Clone the repo</span><br>
+        <span class="cmd">git clone</span> https://github.com/yusuf2145/slapsound.git<br>
+        <span class="cmd">cd</span> slapsound<br><br>
+        <span class="comment"># Build</span><br>
+        <span class="cmd">swift build</span> -c release<br><br>
+        <span class="comment"># Run (needs sudo for accelerometer)</span><br>
+        <span class="cmd">sudo</span> .build/release/SlapSound
+    </div>
+
+    <div class="req-grid">
+        <div class="req-item">
+            <span class="req-icon">&#128187;</span>
+            <div class="req-text">
+                <strong>Apple Silicon</strong>
+                M1 Pro+ MacBook
+            </div>
+        </div>
+        <div class="req-item">
+            <span class="req-icon">&#127823;</span>
+            <div class="req-text">
+                <strong>macOS 14+</strong>
+                Sonoma or later
+            </div>
+        </div>
+        <div class="req-item">
+            <span class="req-icon">&#128274;</span>
+            <div class="req-text">
+                <strong>sudo access</strong>
+                For accelerometer
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-links">
+        <a href="https://github.com/yusuf2145/slapsound">GitHub</a>
+        <a href="https://github.com/yusuf2145/slapsound/blob/main/CONTRIBUTING.md">Contribute</a>
+        <a href="https://github.com/yusuf2145/slapsound/blob/main/LICENSE">MIT License</a>
+    </div>
+    <p>Built by <a href="https://github.com/yusuf2145">Yusuf Garba</a>. Open source. Slap responsibly.</p>
+</footer>
+
+<script>
+function copyCode() {
+    const code = `git clone https://github.com/yusuf2145/slapsound.git
+cd slapsound
+swift build -c release
+sudo .build/release/SlapSound`;
+    navigator.clipboard.writeText(code);
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+</script>
+
+</body>
+</html>
