@@ -30,17 +30,17 @@ struct SlapSoundApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Make app a regular app (not background-only)
         NSApp.setActivationPolicy(.regular)
-        // Bring window to front
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             NSApp.activate(ignoringOtherApps: true)
-            NSApp.windows.first?.makeKeyAndOrderFront(nil)
+            for window in NSApp.windows {
+                window.makeKeyAndOrderFront(nil)
+            }
         }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return false // Keep running in menu bar
+        return false
     }
 }
 
@@ -50,23 +50,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 final class AppState: ObservableObject {
     static let shared = AppState()
 
+    // These use didSet to sync with detector/audio/settings at runtime
     @Published var isConnected = false
     @Published var isEnabled = true {
         didSet {
             detector.isEnabled = isEnabled
             settings.isEnabled = isEnabled
+            print("[SlapSound] Detection: \(isEnabled ? "ON" : "OFF")")
         }
     }
     @Published var sensitivity: Double = 0.05 {
         didSet {
             detector.sensitivity = sensitivity
             settings.sensitivity = sensitivity
+            print("[SlapSound] Sensitivity changed to \(String(format: "%.3f", sensitivity))g")
         }
     }
     @Published var cooldownMs: Int = 150 {
         didSet {
             detector.cooldownMs = cooldownMs
             settings.cooldownMs = cooldownMs
+            print("[SlapSound] Cooldown changed to \(cooldownMs)ms")
         }
     }
     @Published var masterVolume: Double = 1.0 {
@@ -85,19 +89,24 @@ final class AppState: ObservableObject {
         didSet {
             audioPlayer.setSoundMode(soundMode)
             settings.soundMode = soundMode
+            print("[SlapSound] Sound mode: \(soundMode.rawValue)")
         }
     }
     @Published var tonyStarkMode: Bool = false {
         didSet {
             settings.tonyStarkMode = tonyStarkMode
             if tonyStarkMode {
+                print("[SlapSound] TONY STARK MODE ACTIVATED")
                 audioPlayer.playJarvisStartup()
+            } else {
+                print("[SlapSound] Tony Stark Mode deactivated")
             }
         }
     }
     @Published var keyBinding: KeyBinding = .key1 {
         didSet {
             settings.keyBinding = keyBinding
+            print("[SlapSound] Key binding: \(keyBinding.label)")
         }
     }
     @Published var slapCount: Int = 0
@@ -112,44 +121,59 @@ final class AppState: ObservableObject {
     private var bridge: SlapBridge?
 
     private init() {
-        // Force fresh defaults
-        UserDefaults.standard.set(0.05, forKey: "sensitivity")
-        UserDefaults.standard.set(150, forKey: "cooldownMs")
-        UserDefaults.standard.set(1.0, forKey: "masterVolume")
+        // Load saved values from UserDefaults via settings
+        let savedSensitivity = settings.sensitivity
+        let savedCooldown = settings.cooldownMs
+        let savedVolume = settings.masterVolume
 
+        // Apply to detector and audio player DIRECTLY (didSet doesn't fire in init)
+        detector.sensitivity = savedSensitivity
+        detector.cooldownMs = savedCooldown
+        detector.isEnabled = settings.isEnabled
+        audioPlayer.masterVolume = Float(savedVolume)
+        audioPlayer.volumeScaling = settings.volumeScaling
+        audioPlayer.setSoundMode(settings.soundMode)
+
+        // Set published properties (no didSet fires here, that's fine — we synced above)
         isEnabled = settings.isEnabled
-        sensitivity = 0.05
-        cooldownMs = 150
-        masterVolume = 1.0
+        sensitivity = savedSensitivity
+        cooldownMs = savedCooldown
+        masterVolume = savedVolume
         volumeScaling = settings.volumeScaling
         slapCount = settings.slapCount
         tonyStarkMode = settings.tonyStarkMode
         soundMode = settings.soundMode
         keyBinding = settings.keyBinding
 
-        detector.sensitivity = 0.05
-        detector.cooldownMs = 150
-        detector.isEnabled = true
-        audioPlayer.masterVolume = 1.0
-        audioPlayer.volumeScaling = volumeScaling
-        audioPlayer.setSoundMode(soundMode)
-
+        // Wire up delegation
         let bridge = SlapBridge(appState: self)
         self.bridge = bridge
         reader.delegate = detector
         detector.delegate = bridge
 
+        // Start audio
         audioPlayer.setup()
 
+        // Start accelerometer
         let connected = reader.start()
         isConnected = connected
-        statusMessage = connected ? "Listening for slaps..." : "No accelerometer found"
-
-        if !connected {
-            if ProcessInfo.processInfo.environment["USER"] != "root" {
-                statusMessage = "Run with sudo for accelerometer access"
-            }
+        if connected {
+            statusMessage = "Listening for slaps..."
+        } else if ProcessInfo.processInfo.environment["USER"] != "root" {
+            statusMessage = "Run with sudo for accelerometer access"
+        } else {
+            statusMessage = "No accelerometer found (need M1 Pro+ MacBook)"
         }
+
+        print("[SlapSound] === STARTUP ===")
+        print("[SlapSound] Sensor: \(connected ? "CONNECTED" : "NOT FOUND")")
+        print("[SlapSound] Sensitivity: \(String(format: "%.3f", savedSensitivity))g")
+        print("[SlapSound] Cooldown: \(savedCooldown)ms")
+        print("[SlapSound] Volume: \(Int(savedVolume * 100))%")
+        print("[SlapSound] Sound: \(settings.soundMode.rawValue)")
+        print("[SlapSound] Tony Stark: \(settings.tonyStarkMode ? "ON" : "OFF")")
+        print("[SlapSound] Key bind: \(settings.keyBindingLabel)")
+        print("[SlapSound] ===============")
     }
 
     func handleSlap(_ event: SlapEvent) {
@@ -169,13 +193,12 @@ final class AppState: ObservableObject {
     }
 
     private func simulateKeyPress() {
-        guard keyBinding.keyCode != 0 else { return } // "None" selected
+        guard keyBinding.keyCode != 0 else { return }
         let source = CGEventSource(stateID: .hidSystemState)
         if let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: true),
            let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: false) {
             keyDown.post(tap: .cghidEventTap)
             keyUp.post(tap: .cghidEventTap)
-            print("[SlapSound] Pressed '\(keyBinding.label)' key")
         }
     }
 

@@ -36,23 +36,90 @@ struct KeyBinding: Codable, Equatable {
     static let presets: [KeyBinding] = [.none, .key1, .key2, .key3, .spaceBar, .returnKey]
 }
 
-// MARK: - App Settings
+// MARK: - App Settings (UserDefaults wrapper)
 final class AppSettings: ObservableObject {
-    @AppStorage("isEnabled") var isEnabled: Bool = true
-    @AppStorage("sensitivity") var sensitivity: Double = 0.05
-    @AppStorage("cooldownMs") var cooldownMs: Int = 150
-    @AppStorage("masterVolume") var masterVolume: Double = 1.0
-    @AppStorage("volumeScaling") var volumeScaling: Bool = true
-    @AppStorage("slapCount") var slapCount: Int = 0
-    @AppStorage("soundMode") var soundModeRaw: String = SoundMode.whipCrack.rawValue
-    @AppStorage("tonyStarkMode") var tonyStarkMode: Bool = false
-    @AppStorage("keyBindingCode") var keyBindingCode: Int = 18
-    @AppStorage("keyBindingLabel") var keyBindingLabel: String = "1"
-    @AppStorage("clapDetection") var clapDetection: Bool = false
+    private let defaults = UserDefaults.standard
+
+    // Register defaults once so fresh installs get good values
+    init() {
+        defaults.register(defaults: [
+            "isEnabled": true,
+            "sensitivity": 0.05,
+            "cooldownMs": 150,
+            "masterVolume": 1.0,
+            "volumeScaling": true,
+            "slapCount": 0,
+            "soundMode": SoundMode.whipCrack.rawValue,
+            "tonyStarkMode": false,
+            "keyBindingCode": 18,
+            "keyBindingLabel": "1",
+            "clapDetection": false,
+        ])
+    }
+
+    var isEnabled: Bool {
+        get { defaults.bool(forKey: "isEnabled") }
+        set { defaults.set(newValue, forKey: "isEnabled") }
+    }
+
+    var sensitivity: Double {
+        get {
+            let val = defaults.double(forKey: "sensitivity")
+            // If it's 0 or absurdly high, return sensible default
+            return (val > 0 && val <= 10) ? val : 0.05
+        }
+        set { defaults.set(newValue, forKey: "sensitivity") }
+    }
+
+    var cooldownMs: Int {
+        get {
+            let val = defaults.integer(forKey: "cooldownMs")
+            return val > 0 ? val : 150
+        }
+        set { defaults.set(newValue, forKey: "cooldownMs") }
+    }
+
+    var masterVolume: Double {
+        get {
+            let val = defaults.double(forKey: "masterVolume")
+            return (val >= 0 && val <= 1) ? val : 1.0
+        }
+        set { defaults.set(newValue, forKey: "masterVolume") }
+    }
+
+    var volumeScaling: Bool {
+        get { defaults.bool(forKey: "volumeScaling") }
+        set { defaults.set(newValue, forKey: "volumeScaling") }
+    }
+
+    var slapCount: Int {
+        get { defaults.integer(forKey: "slapCount") }
+        set { defaults.set(newValue, forKey: "slapCount") }
+    }
+
+    var soundModeRaw: String {
+        get { defaults.string(forKey: "soundMode") ?? SoundMode.whipCrack.rawValue }
+        set { defaults.set(newValue, forKey: "soundMode") }
+    }
 
     var soundMode: SoundMode {
         get { SoundMode(rawValue: soundModeRaw) ?? .whipCrack }
         set { soundModeRaw = newValue.rawValue }
+    }
+
+    var tonyStarkMode: Bool {
+        get { defaults.bool(forKey: "tonyStarkMode") }
+        set { defaults.set(newValue, forKey: "tonyStarkMode") }
+    }
+
+    var keyBindingCode: Int {
+        get { defaults.integer(forKey: "keyBindingCode") }
+        set { defaults.set(newValue, forKey: "keyBindingCode") }
+    }
+
+    var keyBindingLabel: String {
+        get { defaults.string(forKey: "keyBindingLabel") ?? "1" }
+        set { defaults.set(newValue, forKey: "keyBindingLabel") }
     }
 
     var keyBinding: KeyBinding {
