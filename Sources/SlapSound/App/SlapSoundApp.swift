@@ -5,6 +5,16 @@ struct SlapSoundApp: App {
     @StateObject private var appState = AppState()
 
     var body: some Scene {
+        // Main window
+        Window("SlapSound", id: "main") {
+            MainWindowView()
+                .environmentObject(appState)
+        }
+        .windowStyle(.titleBar)
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
+
+        // Menu bar extra
         MenuBarExtra {
             MenuBarView()
                 .environmentObject(appState)
