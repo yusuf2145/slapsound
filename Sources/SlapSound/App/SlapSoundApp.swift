@@ -176,6 +176,18 @@ final class AppState: ObservableObject {
         print("[SlapSound] ===============")
     }
 
+    func previewSound(_ mode: SoundMode) {
+        audioPlayer.playPreview(mode: mode)
+    }
+
+    func previewJarvis() {
+        audioPlayer.playJarvisBeep()
+    }
+
+    func previewJarvisStartup() {
+        audioPlayer.playJarvisStartup()
+    }
+
     func handleSlap(_ event: SlapEvent) {
         slapCount += 1
         settings.slapCount = slapCount

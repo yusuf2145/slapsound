@@ -34,12 +34,16 @@ struct SoundsView: View {
                         SoundCard(
                             mode: mode,
                             isSelected: appState.soundMode == mode && !appState.tonyStarkMode,
-                            isDisabled: appState.tonyStarkMode
-                        ) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                appState.soundMode = mode
+                            isDisabled: appState.tonyStarkMode,
+                            onSelect: {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    appState.soundMode = mode
+                                }
+                            },
+                            onPreview: {
+                                appState.previewSound(mode)
                             }
-                        }
+                        )
                     }
                 }
 
@@ -121,7 +125,8 @@ struct SoundCard: View {
     let mode: SoundMode
     let isSelected: Bool
     let isDisabled: Bool
-    let action: () -> Void
+    let onSelect: () -> Void
+    let onPreview: () -> Void
 
     private var cardColors: [Color] {
         switch mode {
@@ -134,63 +139,83 @@ struct SoundCard: View {
     }
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: isDisabled ? [.gray.opacity(0.2)] : cardColors.map { $0.opacity(0.15) },
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+        VStack(spacing: 14) {
+            // Tap to select
+            Button(action: onSelect) {
+                VStack(spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: isDisabled ? [.gray.opacity(0.2)] : cardColors.map { $0.opacity(0.15) },
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .frame(width: 56, height: 56)
+                            .frame(width: 56, height: 56)
 
-                    Image(systemName: mode.icon)
-                        .font(.system(size: 24))
-                        .foregroundStyle(
-                            isDisabled
-                                ? LinearGradient(colors: [.gray], startPoint: .top, endPoint: .bottom)
-                                : LinearGradient(colors: cardColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                }
+                        Image(systemName: mode.icon)
+                            .font(.system(size: 24))
+                            .foregroundStyle(
+                                isDisabled
+                                    ? LinearGradient(colors: [.gray], startPoint: .top, endPoint: .bottom)
+                                    : LinearGradient(colors: cardColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                    }
 
-                Text(mode.rawValue)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(isDisabled ? .secondary : .primary)
+                    Text(mode.rawValue)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(isDisabled ? .secondary : .primary)
 
-                if isSelected {
-                    Text("Active")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.green)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Capsule().fill(Color.green.opacity(0.12)))
-                } else {
-                    Text("Select")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.secondary)
+                    if isSelected {
+                        Text("Active")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(Color.green.opacity(0.12)))
+                    } else {
+                        Text("Select")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.primary.opacity(isSelected ? 0.05 : 0.02))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(
-                        isSelected
-                            ? LinearGradient(colors: cardColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                            : LinearGradient(colors: [Color.primary.opacity(0.06)], startPoint: .top, endPoint: .bottom),
-                        lineWidth: isSelected ? 2 : 1
-                    )
-            )
+            .buttonStyle(.plain)
+            .disabled(isDisabled)
+
+            // Preview button
+            Button(action: onPreview) {
+                HStack(spacing: 4) {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 9))
+                    Text("Preview")
+                        .font(.system(size: 10, weight: .medium))
+                }
+                .foregroundColor(cardColors[0])
+                .padding(.horizontal, 12)
+                .padding(.vertical, 5)
+                .background(
+                    Capsule().fill(cardColors[0].opacity(0.1))
+                )
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
-        .disabled(isDisabled)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.primary.opacity(isSelected ? 0.05 : 0.02))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    isSelected
+                        ? LinearGradient(colors: cardColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        : LinearGradient(colors: [Color.primary.opacity(0.06)], startPoint: .top, endPoint: .bottom),
+                    lineWidth: isSelected ? 2 : 1
+                )
+        )
         .opacity(isDisabled ? 0.5 : 1)
     }
 }

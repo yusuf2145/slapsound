@@ -115,6 +115,30 @@ final class AudioPlayer {
         case .airHorn: currentSoundKey = "airhorn"
         case .custom: currentSoundKey = "whipcrack" // fallback
         }
+        print("[SlapSound] Sound set to: \(currentSoundKey) (has buffer: \(soundBuffers[currentSoundKey] != nil))")
+    }
+
+    /// Preview a specific sound mode at full volume
+    func playPreview(mode: SoundMode) {
+        guard isReady else { return }
+        let key: String
+        switch mode {
+        case .whipCrack: key = "whipcrack"
+        case .slap: key = "slap"
+        case .punch: key = "punch"
+        case .airHorn: key = "airhorn"
+        case .custom: key = "whipcrack"
+        }
+        guard let buffer = soundBuffers[key] else {
+            print("[SlapSound] No buffer for \(key)")
+            return
+        }
+        pitchEffect.pitch = 0
+        playerNode.volume = masterVolume
+        playerNode.stop()
+        playerNode.scheduleBuffer(buffer, at: nil, options: .interrupts)
+        playerNode.play()
+        print("[SlapSound] Playing preview: \(key)")
     }
 
     func playSlap(force: Double) {
