@@ -7,7 +7,6 @@
     <meta name="description" content="Slap your MacBook. It plays sounds. That's it. A product by agaro.ai">
     <link rel="icon" href="assets/icon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -246,6 +245,23 @@
             justify-content: center;
         }
 
+        .buy-btn {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
         footer {
             padding: 40px 0;
             text-align: center;
@@ -290,11 +306,7 @@
         <p class="tagline">That's it. That's the app.</p>
 
         <div class="stripe-container">
-            <stripe-buy-button
-                buy-button-id="buy_btn_1TK0ggHbEeDvCZvX47Mcmvvr"
-                publishable-key="pk_live_51T080YHbEeDvCZvXEPAahtTiQ6lBhHryTndddaX9UVIbUDWrIzueeZSpIpRKpxZIo2On8LXvPIa1G4qm2KIjUtnh008l4Wgpyv"
-            >
-            </stripe-buy-button>
+            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Buy SlapSound — $6.77</a>
         </div>
 
         <p class="requirements">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
@@ -395,11 +407,7 @@
         <p class="price-note">One-time payment. Lifetime updates. No subscription.</p>
 
         <div class="stripe-container">
-            <stripe-buy-button
-                buy-button-id="buy_btn_1TK0ggHbEeDvCZvX47Mcmvvr"
-                publishable-key="pk_live_51T080YHbEeDvCZvXEPAahtTiQ6lBhHryTndddaX9UVIbUDWrIzueeZSpIpRKpxZIo2On8LXvPIa1G4qm2KIjUtnh008l4Wgpyv"
-            >
-            </stripe-buy-button>
+            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Buy SlapSound — $6.77</a>
         </div>
     </div>
 
