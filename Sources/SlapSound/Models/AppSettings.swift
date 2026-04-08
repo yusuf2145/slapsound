@@ -56,6 +56,12 @@ final class AppSettings: ObservableObject {
             "keyBindingCode": 18,
             "keyBindingLabel": "1",
             "clapDetection": false,
+            "speechMode": false,
+            "speechText": "Ouch!",
+            "speechVoice": "",
+            "themeName": "Midnight",
+            "combosEnabled": true,
+            "comboTimeout": 2.0,
         ])
     }
 
@@ -130,5 +136,38 @@ final class AppSettings: ObservableObject {
             keyBindingCode = Int(newValue.keyCode)
             keyBindingLabel = newValue.label
         }
+    }
+
+    var speechMode: Bool {
+        get { defaults.bool(forKey: "speechMode") }
+        set { defaults.set(newValue, forKey: "speechMode") }
+    }
+
+    var speechText: String {
+        get { defaults.string(forKey: "speechText") ?? "Ouch!" }
+        set { defaults.set(newValue, forKey: "speechText") }
+    }
+
+    var speechVoice: String {
+        get { defaults.string(forKey: "speechVoice") ?? "" }
+        set { defaults.set(newValue, forKey: "speechVoice") }
+    }
+
+    var themeNameRaw: String {
+        get { defaults.string(forKey: "themeName") ?? "Midnight" }
+        set { defaults.set(newValue, forKey: "themeName") }
+    }
+
+    var combosEnabled: Bool {
+        get { defaults.bool(forKey: "combosEnabled") }
+        set { defaults.set(newValue, forKey: "combosEnabled") }
+    }
+
+    var comboTimeout: Double {
+        get {
+            let val = defaults.double(forKey: "comboTimeout")
+            return val > 0 ? val : 2.0
+        }
+        set { defaults.set(newValue, forKey: "comboTimeout") }
     }
 }

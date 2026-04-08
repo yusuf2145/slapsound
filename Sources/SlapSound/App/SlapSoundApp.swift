@@ -26,24 +26,19 @@ struct SlapSoundApp: App {
     }
 }
 
-// MARK: - AppDelegate to force window visible
+// MARK: - AppDelegate
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
-
-        // Set app icon from bundled .icns
         if let iconURL = Bundle.module.url(forResource: "AppIcon", withExtension: "icns") {
             if let icon = NSImage(contentsOf: iconURL) {
                 NSApp.applicationIconImage = icon
             }
         }
-
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             NSApp.activate(ignoringOtherApps: true)
-            for window in NSApp.windows {
-                window.makeKeyAndOrderFront(nil)
-            }
+            for window in NSApp.windows { window.makeKeyAndOrderFront(nil) }
         }
     }
 
@@ -52,183 +47,163 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-// MARK: - App State (singleton)
+// MARK: - App State
 
 @MainActor
 final class AppState: ObservableObject {
     static let shared = AppState()
 
-    // These use didSet to sync with detector/audio/settings at runtime
+    // Detection
     @Published var isConnected = false
     @Published var isEnabled = true {
-        didSet {
-            detector.isEnabled = isEnabled
-            settings.isEnabled = isEnabled
-            print("[SlapSound] Detection: \(isEnabled ? "ON" : "OFF")")
-        }
+        didSet { detector.isEnabled = isEnabled; settings.isEnabled = isEnabled }
     }
     @Published var sensitivity: Double = 0.05 {
-        didSet {
-            detector.sensitivity = sensitivity
-            settings.sensitivity = sensitivity
-            print("[SlapSound] Sensitivity changed to \(String(format: "%.3f", sensitivity))g")
-        }
+        didSet { detector.sensitivity = sensitivity; settings.sensitivity = sensitivity }
     }
     @Published var cooldownMs: Int = 150 {
-        didSet {
-            detector.cooldownMs = cooldownMs
-            settings.cooldownMs = cooldownMs
-            print("[SlapSound] Cooldown changed to \(cooldownMs)ms")
-        }
+        didSet { detector.cooldownMs = cooldownMs; settings.cooldownMs = cooldownMs }
     }
+
+    // Audio
     @Published var masterVolume: Double = 1.0 {
-        didSet {
-            audioPlayer.masterVolume = Float(masterVolume)
-            settings.masterVolume = masterVolume
-        }
+        didSet { audioPlayer.masterVolume = Float(masterVolume); settings.masterVolume = masterVolume }
     }
     @Published var volumeScaling: Bool = true {
-        didSet {
-            audioPlayer.volumeScaling = volumeScaling
-            settings.volumeScaling = volumeScaling
-        }
+        didSet { audioPlayer.volumeScaling = volumeScaling; settings.volumeScaling = volumeScaling }
     }
     @Published var soundMode: SoundMode = .whipCrack {
-        didSet {
-            audioPlayer.setSoundMode(soundMode)
-            settings.soundMode = soundMode
-            print("[SlapSound] Sound mode: \(soundMode.rawValue)")
-        }
+        didSet { audioPlayer.setSoundMode(soundMode); settings.soundMode = soundMode }
     }
+
+    // Tony Stark
     @Published var tonyStarkMode: Bool = false {
         didSet {
             settings.tonyStarkMode = tonyStarkMode
             if tonyStarkMode {
-                print("[SlapSound] TONY STARK MODE ACTIVATED — no sound on activation, waiting for trigger")
-                // Just start voice listener — NO sound plays on activation
-                voiceListener.startListening()
-                voiceListening = true
+                voiceListener.startListening(); voiceListening = true
             } else {
-                print("[SlapSound] Tony Stark Mode deactivated")
-                audioPlayer.stopPlayback()
-                voiceListener.stopListening()
-                voiceListening = false
+                audioPlayer.stopPlayback(); voiceListener.stopListening(); voiceListening = false
             }
         }
     }
+
+    // Key binding
     @Published var keyBinding: KeyBinding = .key1 {
-        didSet {
-            settings.keyBinding = keyBinding
-            print("[SlapSound] Key binding: \(keyBinding.label)")
-        }
+        didSet { settings.keyBinding = keyBinding }
     }
+
+    // Speech
+    @Published var speechMode: Bool = false {
+        didSet { settings.speechMode = speechMode }
+    }
+    @Published var speechText: String = "Ouch!" {
+        didSet { settings.speechText = speechText }
+    }
+    @Published var speechVoice: String = "" {
+        didSet { settings.speechVoice = speechVoice }
+    }
+
+    // Theme
+    @Published var themeName: ThemeName = .midnight {
+        didSet { settings.themeNameRaw = themeName.rawValue }
+    }
+    var theme: AppTheme { AppTheme.forName(themeName) }
+
+    // Combos
+    @Published var currentCombo: Int = 0
+    @Published var comboAchievement: String? = nil
+    @Published var combosEnabled: Bool = true {
+        didSet { comboDetector.isEnabled = combosEnabled; settings.combosEnabled = combosEnabled }
+    }
+
+    // Stats
     @Published var slapCount: Int = 0
     @Published var lastSlapForce: Double = 0
     @Published var statusMessage: String = "Starting..."
     @Published var recentSlaps: [SlapEvent] = []
-
     @Published var voiceListening = false
     @Published var lastHeardText = ""
 
+    // Services
     let settings = AppSettings()
     let reader = AccelerometerReader()
     let detector = SlapDetector()
     let audioPlayer = AudioPlayer()
     let recorder = AudioRecorder()
     let voiceListener = VoiceCommandListener()
+    let speechService = SpeechService()
+    let comboDetector = ComboDetector()
+    let slapHistory = SlapHistory()
     private var bridge: SlapBridge?
     private var voiceBridge: VoiceBridge?
+    private var comboBridge: ComboBridge?
 
     private init() {
-        // Load saved values — clamp sensitivity to sane range
         var savedSensitivity = settings.sensitivity
         if savedSensitivity <= 0 || savedSensitivity > 5 { savedSensitivity = 0.05 }
         let savedCooldown = settings.cooldownMs > 0 ? settings.cooldownMs : 150
-        let savedVolume = settings.masterVolume
 
-        // Apply to detector and audio player DIRECTLY (didSet doesn't fire in init)
         detector.sensitivity = savedSensitivity
         detector.cooldownMs = savedCooldown
         detector.isEnabled = settings.isEnabled
-        audioPlayer.masterVolume = Float(savedVolume)
+        audioPlayer.masterVolume = Float(settings.masterVolume)
         audioPlayer.volumeScaling = settings.volumeScaling
         audioPlayer.setSoundMode(settings.soundMode)
+        comboDetector.isEnabled = settings.combosEnabled
+        comboDetector.timeout = settings.comboTimeout
 
-        // Set published properties (no didSet fires here, that's fine — we synced above)
         isEnabled = settings.isEnabled
         sensitivity = savedSensitivity
         cooldownMs = savedCooldown
-        masterVolume = savedVolume
+        masterVolume = settings.masterVolume
         volumeScaling = settings.volumeScaling
         slapCount = settings.slapCount
         tonyStarkMode = settings.tonyStarkMode
         soundMode = settings.soundMode
         keyBinding = settings.keyBinding
+        speechMode = settings.speechMode
+        speechText = settings.speechText
+        speechVoice = settings.speechVoice
+        combosEnabled = settings.combosEnabled
+        themeName = ThemeName(rawValue: settings.themeNameRaw) ?? .midnight
 
-        // Wire up delegation
+        // Wire delegates
         let bridge = SlapBridge(appState: self)
         self.bridge = bridge
         reader.delegate = detector
         detector.delegate = bridge
 
-        // Wire up voice commands
         let voiceBridge = VoiceBridge(appState: self)
         self.voiceBridge = voiceBridge
         voiceListener.delegate = voiceBridge
 
-        // Start audio
+        let comboBridge = ComboBridge(appState: self)
+        self.comboBridge = comboBridge
+        comboDetector.delegate = comboBridge
+
         audioPlayer.setup()
+        if recorder.hasRecording { audioPlayer.loadCustomSound(from: recorder.recordingURL) }
 
-        // Load custom sound if exists
-        if recorder.hasRecording {
-            audioPlayer.loadCustomSound(from: recorder.recordingURL)
-        }
-
-        // Start accelerometer
         let connected = reader.start()
         isConnected = connected
-        if connected {
-            statusMessage = "Listening for slaps..."
-        } else if ProcessInfo.processInfo.environment["USER"] != "root" {
-            statusMessage = "Run with sudo for accelerometer access"
-        } else {
-            statusMessage = "No accelerometer found (need M1 Pro+ MacBook)"
-        }
+        statusMessage = connected ? "Listening for slaps..." :
+            (ProcessInfo.processInfo.environment["USER"] != "root" ? "Run with sudo" : "No accelerometer")
 
-        print("[SlapSound] === STARTUP ===")
-        print("[SlapSound] Sensor: \(connected ? "CONNECTED" : "NOT FOUND")")
-        print("[SlapSound] Sensitivity: \(String(format: "%.3f", savedSensitivity))g")
-        print("[SlapSound] Cooldown: \(savedCooldown)ms")
-        print("[SlapSound] Volume: \(Int(savedVolume * 100))%")
-        print("[SlapSound] Sound: \(settings.soundMode.rawValue)")
-        print("[SlapSound] Tony Stark: \(settings.tonyStarkMode ? "ON" : "OFF")")
-        print("[SlapSound] Key bind: \(settings.keyBindingLabel)")
-        print("[SlapSound] ===============")
+        print("[SlapSound] Started — sensor: \(connected), theme: \(themeName.rawValue)")
     }
 
-    func previewSound(_ mode: SoundMode) {
-        audioPlayer.playPreview(mode: mode)
-    }
+    func previewSound(_ mode: SoundMode) { audioPlayer.playPreview(mode: mode) }
+    func previewJarvis() { audioPlayer.playJarvisBeep() }
+    func previewJarvisStartup() { audioPlayer.playJarvisStartup() }
 
-    func loadCustomSoundFromRecording() {
-        audioPlayer.loadCustomSound(from: recorder.recordingURL)
-    }
-
+    func loadCustomSoundFromRecording() { audioPlayer.loadCustomSound(from: recorder.recordingURL) }
     func loadCustomSoundFromFile(_ url: URL) {
-        // Copy to app support dir
         let dest = recorder.recordingURL
         try? FileManager.default.removeItem(at: dest)
         try? FileManager.default.copyItem(at: url, to: dest)
         audioPlayer.loadCustomSound(from: dest)
         recorder.hasRecording = true
-    }
-
-    func previewJarvis() {
-        audioPlayer.playJarvisBeep()
-    }
-
-    func previewJarvisStartup() {
-        audioPlayer.playJarvisStartup()
     }
 
     func handleSlap(_ event: SlapEvent) {
@@ -238,13 +213,25 @@ final class AppState: ObservableObject {
         recentSlaps.append(event)
         if recentSlaps.count > 50 { recentSlaps.removeFirst() }
 
+        // Record in history
+        slapHistory.addSlap(force: event.force, timestamp: event.timestamp)
+
+        // Combo
+        comboDetector.registerSlap()
+
+        // Sound
         if tonyStarkMode {
             audioPlayer.playJarvisBeep()
         } else {
             audioPlayer.playSlap(force: event.force)
         }
 
-        simulateKeyPress()
+        // Action: speech or key press
+        if speechMode {
+            speechService.speak(text: speechText, voiceID: speechVoice.isEmpty ? nil : speechVoice)
+        } else {
+            simulateKeyPress()
+        }
     }
 
     private func simulateKeyPress() {
@@ -259,19 +246,16 @@ final class AppState: ObservableObject {
 
     func handleDoubleClap() {
         guard tonyStarkMode else { return }
-        print("[SlapSound] DOUBLE CLAP — opening Terminal + Claude Code + Iron Man music!")
         triggerTonyStarkAction()
     }
 
     func handleVoiceCommand(_ command: String) {
         guard tonyStarkMode else { return }
-        print("[SlapSound] VOICE COMMAND: \"\(command)\" — activating!")
         lastHeardText = command
         triggerTonyStarkAction()
     }
 
     private func triggerTonyStarkAction() {
-        // 1. Open Terminal and launch Claude Code
         let terminalScript = """
         tell application "Terminal"
             activate
@@ -281,56 +265,64 @@ final class AppState: ObservableObject {
         if let script = NSAppleScript(source: terminalScript) {
             var error: NSDictionary?
             script.executeAndReturnError(&error)
-            if let error = error {
-                print("[SlapSound] AppleScript error: \(error)")
-            }
         }
-
-        // 2. Play the Iron Man soundtrack MP3
         audioPlayer.playIronMan()
     }
 
+    func handleComboUpdate(_ count: Int) {
+        withAnimation { currentCombo = count }
+    }
+
+    func handleComboReset() {
+        withAnimation { currentCombo = 0 }
+    }
+
+    func handleComboAchievement(_ name: String) {
+        withAnimation { comboAchievement = name }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            withAnimation { self?.comboAchievement = nil }
+        }
+    }
+
     deinit {
-        reader.stop()
-        audioPlayer.stop()
-        voiceListener.stopListening()
+        reader.stop(); audioPlayer.stop(); voiceListener.stopListening()
     }
 }
 
-// MARK: - Bridge
+// MARK: - Bridges
 
 final class SlapBridge: SlapDetectorDelegate {
     private weak var appState: AppState?
-
-    init(appState: AppState) {
-        self.appState = appState
-    }
+    init(appState: AppState) { self.appState = appState }
 
     func slapDetector(_ detector: SlapDetector, didDetectSlap event: SlapEvent) {
-        DispatchQueue.main.async { [weak self] in
-            self?.appState?.handleSlap(event)
-        }
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleSlap(event) }
     }
-
     func slapDetectorDidDetectDoubleClap(_ detector: SlapDetector) {
-        DispatchQueue.main.async { [weak self] in
-            self?.appState?.handleDoubleClap()
-        }
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleDoubleClap() }
     }
 }
 
-// MARK: - Voice Bridge
-
 final class VoiceBridge: VoiceCommandDelegate {
     private weak var appState: AppState?
-
-    init(appState: AppState) {
-        self.appState = appState
-    }
+    init(appState: AppState) { self.appState = appState }
 
     func voiceCommandDetected(_ command: String) {
-        DispatchQueue.main.async { [weak self] in
-            self?.appState?.handleVoiceCommand(command)
-        }
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleVoiceCommand(command) }
+    }
+}
+
+final class ComboBridge: ComboDetectorDelegate {
+    private weak var appState: AppState?
+    init(appState: AppState) { self.appState = appState }
+
+    func comboUpdated(count: Int) {
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleComboUpdate(count) }
+    }
+    func comboReset() {
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleComboReset() }
+    }
+    func comboAchievement(name: String) {
+        DispatchQueue.main.async { [weak self] in self?.appState?.handleComboAchievement(name) }
     }
 }

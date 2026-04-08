@@ -6,12 +6,14 @@ struct SoundsView: View {
     @State private var showFilePicker = false
 
     var body: some View {
+        let t = appState.theme
+        let _ = t // used below
         ScrollView {
             VStack(spacing: 20) {
                 HStack {
                     Text("Sounds")
                         .font(.system(size: 24, weight: .bold, design: .monospaced))
-                        .foregroundColor(.white)
+                        .foregroundColor(appState.theme.primary)
                     Spacer()
                 }
 
