@@ -301,7 +301,7 @@
     </nav>
 
     <div class="hero">
-        <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon">
+        <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon" id="slap-icon" onclick="playSlap()" style="cursor:pointer;">
         <h1>Slap your MacBook.<br>It plays sounds.</h1>
         <p class="tagline">That's it. That's the app.</p>
 
@@ -464,5 +464,47 @@
 
 </div>
 
+<script>
+let audioCtx;
+function playSlap() {
+    const icon = document.getElementById('slap-icon');
+
+    // Shake animation
+    icon.style.transition = 'transform 0.05s';
+    icon.style.transform = 'scale(0.9) rotate(-5deg)';
+    setTimeout(() => {
+        icon.style.transform = 'scale(1.05) rotate(3deg)';
+        setTimeout(() => {
+            icon.style.transform = 'scale(1) rotate(0deg)';
+        }, 60);
+    }, 60);
+
+    // Generate whip crack sound with Web Audio API
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = audioCtx;
+    const duration = 0.25;
+    const sampleRate = ctx.sampleRate;
+    const length = Math.floor(sampleRate * duration);
+    const buffer = ctx.createBuffer(1, length, sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let i = 0; i < length; i++) {
+        const t = i / sampleRate;
+        const n = t / duration;
+        // Sharp attack, fast decay
+        const env = n < 0.008 ? n / 0.008 : Math.exp(-18 * (n - 0.008));
+        // Noise + transient crack
+        const noise = Math.random() * 2 - 1;
+        const crack = n < 0.004 ? Math.sin(2 * Math.PI * 3000 * t) * (1 - n / 0.004) : 0;
+        const hi = Math.sin(2 * Math.PI * 5000 * t) * Math.exp(-30 * n) * 0.3;
+        data[i] = (noise * 0.6 + crack * 0.9 + hi) * env * 0.8;
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start();
+}
+</script>
 </body>
 </html>
