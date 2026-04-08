@@ -7,6 +7,7 @@
     <meta name="description" content="Slap your MacBook. It plays sounds. That's it. A product by agaro.ai">
     <link rel="icon" href="assets/icon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -68,27 +69,10 @@
             margin-bottom: 40px;
         }
 
-        .download-btn {
-            display: inline-block;
-            background: #000;
-            color: #fff;
-            padding: 14px 32px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-
         .requirements {
             font-size: 12px;
             opacity: 0.35;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .section {
@@ -198,13 +182,6 @@
             line-height: 1.6;
         }
 
-        .install-box code {
-            background: rgba(0,0,0,0.06);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
         .setting-row {
             display: flex;
             justify-content: space-between;
@@ -258,6 +235,17 @@
         .price { font-size: 48px; font-weight: 800; margin: 8px 0; }
         .price-note { font-size: 13px; opacity: 0.35; }
 
+        .buy-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .stripe-container {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
         footer {
             padding: 40px 0;
             text-align: center;
@@ -292,7 +280,7 @@
         <div class="nav-links">
             <a href="#sounds">Sounds</a>
             <a href="#faq">FAQ</a>
-            <a href="#install">Download</a>
+            <a href="#buy">Buy</a>
         </div>
     </nav>
 
@@ -300,7 +288,15 @@
         <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon">
         <h1>Slap your MacBook.<br>It plays sounds.</h1>
         <p class="tagline">That's it. That's the app.</p>
-        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.2.0-mac.zip" download class="download-btn">Download for Mac</a>
+
+        <div class="stripe-container">
+            <stripe-buy-button
+                buy-button-id="buy_btn_1TK0ggHbEeDvCZvX47Mcmvvr"
+                publishable-key="pk_live_51T080YHbEeDvCZvXEPAahtTiQ6lBhHryTndddaX9UVIbUDWrIzueeZSpIpRKpxZIo2On8LXvPIa1G4qm2KIjUtnh008l4Wgpyv"
+            >
+            </stripe-buy-button>
+        </div>
+
         <p class="requirements">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
     </div>
 
@@ -323,7 +319,7 @@
             <li><span class="sound-name">Punch</span><span class="sound-desc">boxing hit</span></li>
             <li><span class="sound-name">Air Horn</span><span class="sound-desc">MLG classic</span></li>
             <li><span class="sound-name">Sussy UwU</span><span class="sound-desc">you know what this is</span></li>
-            <li><span class="sound-name">Custom</span><span class="sound-desc">bring your own mp3</span></li>
+            <li><span class="sound-name">Custom</span><span class="sound-desc">record or upload your own</span></li>
         </ul>
     </div>
 
@@ -342,7 +338,7 @@
                 <span class="setting-label">Volume</span>
                 <div class="slider-track"><div class="slider-fill" style="width:100%;"></div><div class="slider-dot" style="left:calc(100% - 12px);"></div></div>
             </div>
-            <div class="setting-row"><span class="setting-label">Key Bind</span><span class="setting-value">1, 2, 3, Space, Return, or custom</span></div>
+            <div class="setting-row"><span class="setting-label">Key Bind</span><span class="setting-value">any key, fully customizable</span></div>
             <div class="setting-row"><span class="setting-label">Force Scaling</span><span class="setting-value">harder = louder + higher pitch</span></div>
         </div>
     </div>
@@ -354,8 +350,8 @@
         <h2>Tony Stark Mode</h2>
         <p>One toggle. Your MacBook becomes J.A.R.V.I.S.</p>
         <div class="tony-box">
-            <h3>Double clap = magic</h3>
-            <p>When Tony Stark Mode is active, slap your MacBook twice quickly and it opens Terminal with Claude Code, plays the Iron Man soundtrack, and triggers the J.A.R.V.I.S. startup sound. Every regular slap plays a sci-fi beep instead.</p>
+            <h3>Double clap or say "Jarvis are you there"</h3>
+            <p>When Tony Stark Mode is active, slap your MacBook twice quickly or say the voice command — it opens Terminal with Claude Code and plays the Iron Man soundtrack. Every regular slap plays a sci-fi beep instead.</p>
         </div>
     </div>
 
@@ -366,10 +362,11 @@
         <ul class="feature-list">
             <li>Live dashboard with animated slap visualization</li>
             <li>Real-time force meter and slap counter</li>
-            <li>Recent activity feed</li>
+            <li>Voice command recognition in Tony Stark Mode</li>
+            <li>Record custom 4-second sounds from your mic</li>
             <li>Menu bar quick-access panel</li>
             <li>Simulates any key press on impact</li>
-            <li>Custom key recording</li>
+            <li>18+ quick-select key bindings</li>
             <li>Preview buttons for all sounds</li>
             <li>Persists settings between sessions</li>
         </ul>
@@ -378,28 +375,32 @@
     <hr class="divider">
 
     <div class="section" id="install">
-        <p class="label">Get Started</p>
-        <h2>Download and run.</h2>
+        <p class="label">After Purchase</p>
+        <h2>How to install.</h2>
 
         <div class="install-box">
-            <h3>How to install</h3>
+            <h3>3 steps</h3>
             <ol>
-                <li>Click <strong>Download for Mac</strong> to get the .zip file</li>
-                <li>Unzip it — you'll see <strong>SlapSound.app</strong></li>
-                <li>Right-click SlapSound.app and select <strong>Open</strong></li>
-                <li>macOS will ask if you're sure — click <strong>Open</strong> again</li>
-                <li>The app opens with a dashboard and menu bar icon. Start slapping.</li>
+                <li>Complete payment — you'll receive a download link</li>
+                <li>Unzip the file — you'll see <strong>SlapSound.app</strong></li>
+                <li>Right-click SlapSound.app, select <strong>Open</strong>, confirm. Start slapping.</li>
             </ol>
         </div>
     </div>
 
     <hr class="divider">
 
-    <div class="section" style="text-align:center;">
-        <p class="price">$10</p>
+    <div class="buy-section" id="buy">
+        <p class="price">$6.77</p>
         <p class="price-note">One-time payment. Lifetime updates. No subscription.</p>
-        <br><br>
-        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.2.0-mac.zip" download class="download-btn">Buy SlapSound — $10</a>
+
+        <div class="stripe-container">
+            <stripe-buy-button
+                buy-button-id="buy_btn_1TK0ggHbEeDvCZvX47Mcmvvr"
+                publishable-key="pk_live_51T080YHbEeDvCZvXEPAahtTiQ6lBhHryTndddaX9UVIbUDWrIzueeZSpIpRKpxZIo2On8LXvPIa1G4qm2KIjUtnh008l4Wgpyv"
+            >
+            </stripe-buy-button>
+        </div>
     </div>
 
     <hr class="divider">
@@ -408,12 +409,12 @@
         <h2>FAQ</h2>
         <div style="margin-top:20px;">
             <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">macOS won't let me open it?</div>
-                <div class="faq-a">Right-click (or Control-click) the app and select "Open" instead of double-clicking. macOS will show a dialog — click "Open" to confirm. You only need to do this once.</div>
+                <div class="faq-q">How do I get the download after paying?</div>
+                <div class="faq-a">After payment, you'll receive a download link via email. You can also access it from your Stripe receipt.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">Why does it need sudo?</div>
-                <div class="faq-a">The MacBook's accelerometer requires root privileges to access. The app only reads sensor data locally — nothing leaves your machine.</div>
+                <div class="faq-q">macOS won't let me open it?</div>
+                <div class="faq-a">Right-click (or Control-click) the app and select "Open" instead of double-clicking. macOS will show a dialog — click "Open" to confirm. You only need to do this once.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Which Macs are supported?</div>
@@ -425,15 +426,15 @@
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Can I add my own sounds?</div>
-                <div class="faq-a">Yes. Select "Custom" in the Sounds tab and add your own .mp3 files.</div>
-            </div>
-            <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">The key press isn't working?</div>
-                <div class="faq-a">Go to System Settings > Privacy & Security > Accessibility and allow Terminal. macOS requires permission to simulate key events.</div>
+                <div class="faq-a">Yes. Record up to 4 seconds from your mic or upload any MP3/WAV file in the Sounds tab.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">What's Tony Stark Mode?</div>
-                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap your MacBook and it opens Terminal with Claude Code and plays the Iron Man soundtrack.</div>
+                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap your MacBook or say "Jarvis are you there" to open Claude Code and play the Iron Man soundtrack.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Can I get a refund?</div>
+                <div class="faq-a">Contact us at contact@agaro.ai within 7 days of purchase for a full refund.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Is this on the App Store?</div>
