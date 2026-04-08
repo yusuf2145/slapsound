@@ -38,7 +38,7 @@ final class AudioPlayer {
 
     private func loadAllSounds(format: AVAudioFormat) {
         // Try to load each sound file
-        let soundNames = ["whipcrack", "slap", "punch", "airhorn", "moan", "jarvis", "jarvis_welcome"]
+        let soundNames = ["whipcrack", "slap", "punch", "airhorn", "moan", "jarvis", "jarvis_welcome", "ironman"]
         let extensions = ["mp3", "wav", "m4a"]
 
         for name in soundNames {
@@ -114,9 +114,20 @@ final class AudioPlayer {
         case .punch: currentSoundKey = "punch"
         case .airHorn: currentSoundKey = "airhorn"
         case .moan: currentSoundKey = "moan"
-        case .custom: currentSoundKey = "whipcrack" // fallback
+        case .custom: currentSoundKey = "custom"
         }
         print("[SlapSound] Sound set to: \(currentSoundKey) (has buffer: \(soundBuffers[currentSoundKey] != nil))")
+    }
+
+    /// Load a custom sound from a file URL on disk
+    func loadCustomSound(from url: URL) {
+        guard let format = engineFormat else { return }
+        if let buffer = loadSoundFile(url: url, format: format) {
+            soundBuffers["custom"] = buffer
+            print("[SlapSound] Custom sound loaded from: \(url.lastPathComponent)")
+        } else {
+            print("[SlapSound] Failed to load custom sound from: \(url.path)")
+        }
     }
 
     /// Preview a specific sound mode at full volume
@@ -129,7 +140,7 @@ final class AudioPlayer {
         case .punch: key = "punch"
         case .airHorn: key = "airhorn"
         case .moan: key = "moan"
-        case .custom: key = "whipcrack"
+        case .custom: key = "custom"
         }
         guard let buffer = soundBuffers[key] else {
             print("[SlapSound] No buffer for \(key)")
@@ -183,6 +194,24 @@ final class AudioPlayer {
         playerNode.stop()
         playerNode.scheduleBuffer(buffer, at: nil, options: .interrupts)
         playerNode.play()
+    }
+
+    func playIronMan() {
+        guard isReady else { return }
+        guard let buffer = soundBuffers["ironman"] else {
+            print("[SlapSound] No ironman buffer found")
+            return
+        }
+        pitchEffect.pitch = 0
+        playerNode.volume = masterVolume
+        playerNode.stop()
+        playerNode.scheduleBuffer(buffer, at: nil, options: .interrupts)
+        playerNode.play()
+        print("[SlapSound] Playing Iron Man soundtrack")
+    }
+
+    func stopPlayback() {
+        playerNode.stop()
     }
 
     func stop() {

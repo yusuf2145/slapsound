@@ -35,7 +35,7 @@ struct KeyBinding: Codable, Equatable {
     static let returnKey = KeyBinding(keyCode: 36, label: "Return")
     static let none = KeyBinding(keyCode: 0, label: "None")
 
-    static let presets: [KeyBinding] = [.none, .key1, .key2, .key3, .spaceBar, .returnKey]
+    static var presets: [KeyBinding] = [.none, .key1, .key2, .key3, .spaceBar, .returnKey]
 }
 
 // MARK: - App Settings (UserDefaults wrapper)

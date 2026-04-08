@@ -4,6 +4,8 @@ struct KeyBindsView: View {
     @EnvironmentObject var appState: AppState
     @State private var isRecording = false
     @State private var recordedKey: String = ""
+    @State private var editingPresetIndex: Int? = nil
+    @State private var localMonitor: Any? = nil
 
     var body: some View {
         ScrollView {
@@ -36,7 +38,6 @@ struct KeyBindsView: View {
                             .frame(height: 100)
 
                         HStack(spacing: 20) {
-                            // Key visual
                             ZStack {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color.primary.opacity(0.06))
@@ -44,7 +45,6 @@ struct KeyBindsView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.primary.opacity(0.12), lineWidth: 1)
                                     .frame(width: 64, height: 64)
-                                // Shadow to look like key
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color.primary.opacity(0.03))
                                     .frame(width: 64, height: 64)
@@ -73,8 +73,8 @@ struct KeyBindsView: View {
 
                 Divider()
 
-                // Preset keys
-                Text("PRESET KEYS")
+                // Quick select
+                Text("QUICK SELECT")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
                     .tracking(1.5)
@@ -85,50 +85,47 @@ struct KeyBindsView: View {
                     GridItem(.flexible(), spacing: 12),
                     GridItem(.flexible(), spacing: 12),
                 ], spacing: 12) {
-                    ForEach(KeyBinding.presets, id: \.keyCode) { binding in
+                    ForEach(Array(KeyBinding.presets.enumerated()), id: \.offset) { index, binding in
                         KeyPresetCard(
                             binding: binding,
-                            isSelected: appState.keyBinding == binding
-                        ) {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                appState.keyBinding = binding
+                            isSelected: appState.keyBinding == binding,
+                            isEditing: editingPresetIndex == index,
+                            onSelect: {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    appState.keyBinding = binding
+                                }
+                            },
+                            onEdit: {
+                                startEditingPreset(index)
                             }
-                        }
+                        )
                     }
                 }
 
                 Divider()
 
-                // Custom key input
-                Text("CUSTOM KEY")
+                // Record any key
+                Text("PRESS ANY KEY")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
                     .tracking(1.5)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Record Custom Key")
                                 .font(.system(size: 14, weight: .medium))
-                            Text("Click record, then press any key to bind it")
+                            Text("Click record, then press any key on your keyboard")
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
                         Button {
-                            isRecording.toggle()
                             if isRecording {
-                                recordedKey = "Press a key..."
-                                NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                                    appState.keyBinding = KeyBinding(
-                                        keyCode: event.keyCode,
-                                        label: event.charactersIgnoringModifiers?.uppercased() ?? "Key \(event.keyCode)"
-                                    )
-                                    isRecording = false
-                                    recordedKey = appState.keyBinding.label
-                                    return nil
-                                }
+                                stopListening()
+                            } else {
+                                startListeningForKey()
                             }
                         } label: {
                             HStack(spacing: 6) {
@@ -138,6 +135,7 @@ struct KeyBindsView: View {
                                 Text(isRecording ? "Listening..." : "Record")
                                     .font(.system(size: 12, weight: .semibold))
                             }
+                            .foregroundColor(isRecording ? .red : .orange)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(
@@ -159,6 +157,35 @@ struct KeyBindsView: View {
                             Text(recordedKey)
                                 .font(.system(size: 12))
                                 .foregroundColor(isRecording ? .orange : .green)
+                        }
+                    }
+
+                    // Common keys quick-pick
+                    Text("Or pick a common key:")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
+                        ForEach(commonKeys, id: \.keyCode) { key in
+                            Button {
+                                appState.keyBinding = key
+                                recordedKey = key.label
+                            } label: {
+                                Text(key.label)
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(appState.keyBinding == key ? Color.orange.opacity(0.15) : Color.primary.opacity(0.05))
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .stroke(appState.keyBinding == key ? Color.orange.opacity(0.3) : Color.primary.opacity(0.08), lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -189,50 +216,134 @@ struct KeyBindsView: View {
             .padding(32)
         }
     }
+
+    // Common keys people might want
+    private var commonKeys: [KeyBinding] {
+        [
+            KeyBinding(keyCode: 0, label: "A"),
+            KeyBinding(keyCode: 11, label: "B"),
+            KeyBinding(keyCode: 8, label: "C"),
+            KeyBinding(keyCode: 2, label: "D"),
+            KeyBinding(keyCode: 14, label: "E"),
+            KeyBinding(keyCode: 3, label: "F"),
+            KeyBinding(keyCode: 18, label: "1"),
+            KeyBinding(keyCode: 19, label: "2"),
+            KeyBinding(keyCode: 20, label: "3"),
+            KeyBinding(keyCode: 21, label: "4"),
+            KeyBinding(keyCode: 23, label: "5"),
+            KeyBinding(keyCode: 49, label: "Space"),
+            KeyBinding(keyCode: 36, label: "Return"),
+            KeyBinding(keyCode: 48, label: "Tab"),
+            KeyBinding(keyCode: 53, label: "Esc"),
+            KeyBinding(keyCode: 51, label: "Delete"),
+            KeyBinding(keyCode: 126, label: "Up"),
+            KeyBinding(keyCode: 125, label: "Down"),
+        ]
+    }
+
+    private func startListeningForKey() {
+        isRecording = true
+        recordedKey = "Press a key..."
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            let label = event.charactersIgnoringModifiers?.uppercased() ?? "Key \(event.keyCode)"
+            appState.keyBinding = KeyBinding(keyCode: event.keyCode, label: label)
+            recordedKey = "Bound to: \(label)"
+            stopListening()
+            return nil
+        }
+    }
+
+    private func stopListening() {
+        isRecording = false
+        if let monitor = localMonitor {
+            NSEvent.removeMonitor(monitor)
+            localMonitor = nil
+        }
+    }
+
+    private func startEditingPreset(_ index: Int) {
+        editingPresetIndex = index
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            let label = event.charactersIgnoringModifiers?.uppercased() ?? "Key \(event.keyCode)"
+            let newBinding = KeyBinding(keyCode: event.keyCode, label: label)
+            // Update the preset in-place
+            KeyBinding.presets[index] = newBinding
+            appState.keyBinding = newBinding
+            editingPresetIndex = nil
+            if let monitor = localMonitor {
+                NSEvent.removeMonitor(monitor)
+                localMonitor = nil
+            }
+            return nil
+        }
+    }
 }
 
 struct KeyPresetCard: View {
     let binding: KeyBinding
     let isSelected: Bool
-    let action: () -> Void
+    let isEditing: Bool
+    let onSelect: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.primary.opacity(isSelected ? 0.1 : 0.05))
-                        .frame(width: 48, height: 48)
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.primary.opacity(isSelected ? 0.2 : 0.08), lineWidth: 1)
-                        .frame(width: 48, height: 48)
+        VStack(spacing: 10) {
+            Button(action: onSelect) {
+                VStack(spacing: 10) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.primary.opacity(isSelected ? 0.1 : 0.05))
+                            .frame(width: 48, height: 48)
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isEditing ? Color.red.opacity(0.5) : Color.primary.opacity(isSelected ? 0.2 : 0.08), lineWidth: isEditing ? 2 : 1)
+                            .frame(width: 48, height: 48)
 
-                    Text(binding.label == "None" ? "--" : binding.label)
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(isSelected ? .orange : .primary)
-                }
+                        if isEditing {
+                            Text("...")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.red)
+                        } else {
+                            Text(binding.label == "None" ? "--" : binding.label)
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundColor(isSelected ? .orange : .primary)
+                        }
+                    }
 
-                Text(binding.label)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(isSelected ? .primary : .secondary)
+                    Text(isEditing ? "Press key..." : binding.label)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(isEditing ? .red : (isSelected ? .primary : .secondary))
 
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(.green)
+                    if isSelected && !isEditing {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(.green)
+                    }
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.orange.opacity(0.06) : Color.primary.opacity(0.02))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.orange.opacity(0.3) : Color.primary.opacity(0.06), lineWidth: isSelected ? 2 : 1)
-            )
+            .buttonStyle(.plain)
+
+            // Edit button
+            if !isEditing && binding.label != "None" {
+                Button(action: onEdit) {
+                    Text("Edit")
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Color.primary.opacity(0.04)))
+                }
+                .buttonStyle(.plain)
+            }
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isSelected ? Color.orange.opacity(0.06) : Color.primary.opacity(0.02))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isSelected ? Color.orange.opacity(0.3) : Color.primary.opacity(0.06), lineWidth: isSelected ? 2 : 1)
+        )
     }
 }

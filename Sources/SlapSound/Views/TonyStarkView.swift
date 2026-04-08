@@ -203,12 +203,12 @@ struct TonyStarkView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        appState.previewJarvisStartup()
+                        appState.audioPlayer.playIronMan()
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "play.fill")
                                 .font(.system(size: 11))
-                            Text("Startup Sound")
+                            Text("Iron Man Theme")
                                 .font(.system(size: 12, weight: .semibold))
                         }
                         .foregroundColor(.red)
@@ -224,6 +224,41 @@ struct TonyStarkView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                }
+
+                // Voice command status
+                if appState.tonyStarkMode {
+                    VStack(spacing: 8) {
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(appState.voiceListening ? Color.green : Color.red)
+                                .frame(width: 8, height: 8)
+                            Text(appState.voiceListening ? "Voice commands active — say \"Jarvis are you there\"" : "Voice commands off")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(appState.voiceListening ? .green : .secondary)
+                            Spacer()
+                        }
+                        if !appState.lastHeardText.isEmpty {
+                            HStack {
+                                Image(systemName: "mic.fill")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.cyan)
+                                Text("Heard: \"\(appState.lastHeardText)\"")
+                                    .font(.system(size: 11, design: .monospaced))
+                                    .foregroundColor(.cyan.opacity(0.7))
+                                Spacer()
+                            }
+                        }
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.primary.opacity(0.03))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(appState.voiceListening ? Color.green.opacity(0.2) : Color.primary.opacity(0.06), lineWidth: 1)
+                    )
                 }
 
                 // Feature description
@@ -243,15 +278,21 @@ struct TonyStarkView: View {
                         )
                         FeatureCard(
                             icon: "power",
-                            title: "Startup Sound",
-                            description: "Plays an arc reactor power-up sequence when activated",
+                            title: "Iron Man Theme",
+                            description: "Plays the Iron Man soundtrack when activated or on double-clap",
                             color: .red
                         )
                         FeatureCard(
                             icon: "hands.clap.fill",
                             title: "Double Clap",
-                            description: "Clap twice to open Terminal with Claude Code + play Iron Man soundtrack",
+                            description: "Clap twice to open Terminal with Claude Code + play Iron Man theme",
                             color: .orange
+                        )
+                        FeatureCard(
+                            icon: "mic.fill",
+                            title: "Voice Command",
+                            description: "Say \"Jarvis are you there\" to trigger Claude Code + Iron Man theme",
+                            color: .green
                         )
                         FeatureCard(
                             icon: "bolt.fill",

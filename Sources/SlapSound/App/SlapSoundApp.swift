@@ -97,9 +97,14 @@ final class AppState: ObservableObject {
             settings.tonyStarkMode = tonyStarkMode
             if tonyStarkMode {
                 print("[SlapSound] TONY STARK MODE ACTIVATED")
-                audioPlayer.playJarvisStartup()
+                audioPlayer.playIronMan()
+                voiceListener.startListening()
+                voiceListening = true
             } else {
                 print("[SlapSound] Tony Stark Mode deactivated")
+                audioPlayer.stopPlayback()
+                voiceListener.stopListening()
+                voiceListening = false
             }
         }
     }
@@ -114,11 +119,17 @@ final class AppState: ObservableObject {
     @Published var statusMessage: String = "Starting..."
     @Published var recentSlaps: [SlapEvent] = []
 
+    @Published var voiceListening = false
+    @Published var lastHeardText = ""
+
     let settings = AppSettings()
     let reader = AccelerometerReader()
     let detector = SlapDetector()
     let audioPlayer = AudioPlayer()
+    let recorder = AudioRecorder()
+    let voiceListener = VoiceCommandListener()
     private var bridge: SlapBridge?
+    private var voiceBridge: VoiceBridge?
 
     private init() {
         // Load saved values from UserDefaults via settings
@@ -151,8 +162,18 @@ final class AppState: ObservableObject {
         reader.delegate = detector
         detector.delegate = bridge
 
+        // Wire up voice commands
+        let voiceBridge = VoiceBridge(appState: self)
+        self.voiceBridge = voiceBridge
+        voiceListener.delegate = voiceBridge
+
         // Start audio
         audioPlayer.setup()
+
+        // Load custom sound if exists
+        if recorder.hasRecording {
+            audioPlayer.loadCustomSound(from: recorder.recordingURL)
+        }
 
         // Start accelerometer
         let connected = reader.start()
@@ -178,6 +199,19 @@ final class AppState: ObservableObject {
 
     func previewSound(_ mode: SoundMode) {
         audioPlayer.playPreview(mode: mode)
+    }
+
+    func loadCustomSoundFromRecording() {
+        audioPlayer.loadCustomSound(from: recorder.recordingURL)
+    }
+
+    func loadCustomSoundFromFile(_ url: URL) {
+        // Copy to app support dir
+        let dest = recorder.recordingURL
+        try? FileManager.default.removeItem(at: dest)
+        try? FileManager.default.copyItem(at: url, to: dest)
+        audioPlayer.loadCustomSound(from: dest)
+        recorder.hasRecording = true
     }
 
     func previewJarvis() {
@@ -216,8 +250,18 @@ final class AppState: ObservableObject {
 
     func handleDoubleClap() {
         guard tonyStarkMode else { return }
-        print("[SlapSound] DOUBLE CLAP in Tony Stark Mode — opening Terminal + Claude Code + Iron Man music!")
+        print("[SlapSound] DOUBLE CLAP — opening Terminal + Claude Code + Iron Man music!")
+        triggerTonyStarkAction()
+    }
 
+    func handleVoiceCommand(_ command: String) {
+        guard tonyStarkMode else { return }
+        print("[SlapSound] VOICE COMMAND: \"\(command)\" — activating!")
+        lastHeardText = command
+        triggerTonyStarkAction()
+    }
+
+    private func triggerTonyStarkAction() {
         // 1. Open Terminal and launch Claude Code
         let terminalScript = """
         tell application "Terminal"
@@ -233,19 +277,14 @@ final class AppState: ObservableObject {
             }
         }
 
-        // 2. Open Iron Man soundtrack in browser
-        let ironManURL = "https://www.youtube.com/watch?v=IyR25B-IGyg&list=RDIyR25B-IGyg&start_radio=1"
-        if let url = URL(string: ironManURL) {
-            NSWorkspace.shared.open(url)
-        }
-
-        // 3. Play the J.A.R.V.I.S. startup sound
-        audioPlayer.playJarvisStartup()
+        // 2. Play the Iron Man soundtrack MP3
+        audioPlayer.playIronMan()
     }
 
     deinit {
         reader.stop()
         audioPlayer.stop()
+        voiceListener.stopListening()
     }
 }
 
@@ -267,6 +306,22 @@ final class SlapBridge: SlapDetectorDelegate {
     func slapDetectorDidDetectDoubleClap(_ detector: SlapDetector) {
         DispatchQueue.main.async { [weak self] in
             self?.appState?.handleDoubleClap()
+        }
+    }
+}
+
+// MARK: - Voice Bridge
+
+final class VoiceBridge: VoiceCommandDelegate {
+    private weak var appState: AppState?
+
+    init(appState: AppState) {
+        self.appState = appState
+    }
+
+    func voiceCommandDetected(_ command: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.appState?.handleVoiceCommand(command)
         }
     }
 }
