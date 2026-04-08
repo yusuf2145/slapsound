@@ -5,7 +5,7 @@
     <key>CFBundleExecutable</key>
     <string>SlapSound</string>
     <key>CFBundleIdentifier</key>
-    <string>com.yusufgarba.slapsound</string>
+    <string>ai.agaro.slapsound</string>
     <key>CFBundleName</key>
     <string>SlapSound</string>
     <key>CFBundleVersion</key>
