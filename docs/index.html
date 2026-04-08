@@ -300,7 +300,7 @@
         <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon">
         <h1>Slap your MacBook.<br>It plays sounds.</h1>
         <p class="tagline">That's it. That's the app.</p>
-        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.0-mac.zip" download class="download-btn">Download for Mac</a>
+        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.1-mac.zip" download class="download-btn">Download for Mac</a>
         <p class="requirements">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
     </div>
 
@@ -384,11 +384,11 @@
         <div class="install-box">
             <h3>How to install</h3>
             <ol>
-                <li>Click <strong>Download for Mac</strong> above to get the .zip file</li>
-                <li>Unzip <code>SlapSound-v2.0.0-mac.zip</code></li>
-                <li>Open Terminal and run:<br><code>sudo xattr -rd com.apple.quarantine ~/Downloads/SlapSound.app</code><br><span style="font-size:12px;opacity:0.4;">(this removes the macOS "damaged" warning for unsigned apps)</span></li>
-                <li>Then run:<br><code>sudo ~/Downloads/SlapSound.app/Contents/MacOS/SlapSound</code></li>
-                <li>Enter your Mac password. The app appears in your menu bar and opens a dashboard window.</li>
+                <li>Click <strong>Download for Mac</strong> to get the .zip file</li>
+                <li>Unzip it — you'll see <strong>SlapSound.app</strong></li>
+                <li>Right-click SlapSound.app and select <strong>Open</strong></li>
+                <li>macOS will ask if you're sure — click <strong>Open</strong> again</li>
+                <li>The app opens with a dashboard and menu bar icon. Start slapping.</li>
             </ol>
         </div>
     </div>
@@ -399,7 +399,7 @@
         <p class="price">$10</p>
         <p class="price-note">One-time payment. Lifetime updates. No subscription.</p>
         <br><br>
-        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.0-mac.zip" download class="download-btn">Buy SlapSound — $10</a>
+        <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.1-mac.zip" download class="download-btn">Buy SlapSound — $10</a>
     </div>
 
     <hr class="divider">
@@ -408,8 +408,8 @@
         <h2>FAQ</h2>
         <div style="margin-top:20px;">
             <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">It says "damaged" when I open it?</div>
-                <div class="faq-a">macOS quarantines apps downloaded outside the App Store. Open Terminal and run: <code>sudo xattr -rd com.apple.quarantine ~/Downloads/SlapSound.app</code> — then launch again. This is safe and normal for unsigned apps.</div>
+                <div class="faq-q">macOS won't let me open it?</div>
+                <div class="faq-a">Right-click (or Control-click) the app and select "Open" instead of double-clicking. macOS will show a dialog — click "Open" to confirm. You only need to do this once.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Why does it need sudo?</div>
