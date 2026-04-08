@@ -96,8 +96,8 @@ final class AppState: ObservableObject {
         didSet {
             settings.tonyStarkMode = tonyStarkMode
             if tonyStarkMode {
-                print("[SlapSound] TONY STARK MODE ACTIVATED")
-                audioPlayer.playIronMan()
+                print("[SlapSound] TONY STARK MODE ACTIVATED — no sound on activation, waiting for trigger")
+                // Just start voice listener — NO sound plays on activation
                 voiceListener.startListening()
                 voiceListening = true
             } else {
@@ -132,9 +132,10 @@ final class AppState: ObservableObject {
     private var voiceBridge: VoiceBridge?
 
     private init() {
-        // Load saved values from UserDefaults via settings
-        let savedSensitivity = settings.sensitivity
-        let savedCooldown = settings.cooldownMs
+        // Load saved values — clamp sensitivity to sane range
+        var savedSensitivity = settings.sensitivity
+        if savedSensitivity <= 0 || savedSensitivity > 5 { savedSensitivity = 0.05 }
+        let savedCooldown = settings.cooldownMs > 0 ? settings.cooldownMs : 150
         let savedVolume = settings.masterVolume
 
         // Apply to detector and audio player DIRECTLY (didSet doesn't fire in init)

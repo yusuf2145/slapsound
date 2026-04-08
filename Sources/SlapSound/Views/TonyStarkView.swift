@@ -2,376 +2,203 @@ import SwiftUI
 
 struct TonyStarkView: View {
     @EnvironmentObject var appState: AppState
-    @State private var arcReactorPulse: CGFloat = 1.0
-    @State private var arcReactorGlow: Double = 0.3
-    @State private var showActivation = false
-    @State private var particleRotation: Double = 0
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var ringRotation: Double = 0
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 32) {
-                // Header
+            VStack(spacing: 20) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 8) {
-                            Text("Tony Stark Mode")
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                            if appState.tonyStarkMode {
-                                Text("ACTIVE")
-                                    .font(.system(size: 10, weight: .heavy, design: .rounded))
-                                    .foregroundColor(.red)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 3)
-                                    .background(Capsule().fill(Color.red.opacity(0.12)))
-                            }
-                        }
-                        Text("Transform your MacBook into J.A.R.V.I.S.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.secondary)
+                    Text("Tony Stark Mode")
+                        .font(.system(size: 24, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                    if appState.tonyStarkMode {
+                        Text("ON")
+                            .font(.system(size: 10, weight: .black, design: .monospaced))
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(Color.white))
                     }
                     Spacer()
                 }
 
-                // Arc Reactor visualization
+                // Arc reactor
                 ZStack {
-                    // Dark background
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Color.black.opacity(0.85))
-                        .frame(height: 320)
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.black)
+                        .frame(height: 260)
 
-                    // Stars
-                    ForEach(0..<20, id: \.self) { i in
-                        Circle()
-                            .fill(Color.white.opacity(Double.random(in: 0.1...0.4)))
-                            .frame(width: CGFloat.random(in: 1...3))
-                            .offset(
-                                x: CGFloat.random(in: -250...250),
-                                y: CGFloat.random(in: -140...140)
-                            )
-                    }
-
-                    VStack(spacing: 24) {
-                        // Arc reactor
-                        ZStack {
-                            // Outer glow
-                            if appState.tonyStarkMode {
-                                Circle()
-                                    .fill(
-                                        RadialGradient(
-                                            colors: [.cyan.opacity(arcReactorGlow), .blue.opacity(arcReactorGlow * 0.5), .clear],
-                                            center: .center,
-                                            startRadius: 20,
-                                            endRadius: 100
-                                        )
-                                    )
-                                    .frame(width: 200, height: 200)
-                                    .scaleEffect(arcReactorPulse)
-
-                                // Rotating energy ring
-                                Circle()
-                                    .trim(from: 0.0, to: 0.3)
-                                    .stroke(Color.cyan.opacity(0.3), lineWidth: 2)
-                                    .frame(width: 120, height: 120)
-                                    .rotationEffect(.degrees(particleRotation))
-
-                                Circle()
-                                    .trim(from: 0.5, to: 0.7)
-                                    .stroke(Color.cyan.opacity(0.2), lineWidth: 1.5)
-                                    .frame(width: 100, height: 100)
-                                    .rotationEffect(.degrees(-particleRotation * 0.7))
-                            }
-
-                            // Outer ring
+                    ZStack {
+                        if appState.tonyStarkMode {
+                            // Glow
                             Circle()
-                                .stroke(
-                                    appState.tonyStarkMode ? Color.cyan.opacity(0.4) : Color.gray.opacity(0.2),
-                                    lineWidth: 3
-                                )
-                                .frame(width: 90, height: 90)
+                                .fill(RadialGradient(colors: [.white.opacity(0.08), .clear], center: .center, startRadius: 10, endRadius: 80))
+                                .frame(width: 160, height: 160)
+                                .scaleEffect(pulseScale)
 
-                            // Inner segments
-                            ForEach(0..<8, id: \.self) { i in
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(appState.tonyStarkMode ? Color.cyan.opacity(0.3) : Color.gray.opacity(0.1))
-                                    .frame(width: 3, height: 15)
-                                    .offset(y: -34)
-                                    .rotationEffect(.degrees(Double(i) * 45))
-                            }
-
-                            // Core triangle
-                            Triangle()
-                                .fill(
-                                    appState.tonyStarkMode
-                                        ? LinearGradient(colors: [.cyan, .white], startPoint: .top, endPoint: .bottom)
-                                        : LinearGradient(colors: [.gray.opacity(0.3), .gray.opacity(0.1)], startPoint: .top, endPoint: .bottom)
-                                )
-                                .frame(width: 30, height: 30)
-                                .rotationEffect(.degrees(180))
-
-                            // Center dot
+                            // Spinning ring
                             Circle()
-                                .fill(appState.tonyStarkMode ? Color.white : Color.gray.opacity(0.3))
-                                .frame(width: 8, height: 8)
-                                .shadow(color: appState.tonyStarkMode ? .cyan : .clear, radius: 8)
+                                .trim(from: 0, to: 0.25)
+                                .stroke(Color.white.opacity(0.15), lineWidth: 1.5)
+                                .frame(width: 100, height: 100)
+                                .rotationEffect(.degrees(ringRotation))
                         }
+
+                        // Outer ring
+                        Circle()
+                            .stroke(Color.white.opacity(appState.tonyStarkMode ? 0.3 : 0.08), lineWidth: 2)
+                            .frame(width: 80, height: 80)
+
+                        // Segments
+                        ForEach(0..<6, id: \.self) { i in
+                            Rectangle()
+                                .fill(Color.white.opacity(appState.tonyStarkMode ? 0.2 : 0.05))
+                                .frame(width: 2, height: 10)
+                                .offset(y: -30)
+                                .rotationEffect(.degrees(Double(i) * 60))
+                        }
+
+                        // Core
+                        Circle()
+                            .fill(Color.white.opacity(appState.tonyStarkMode ? 0.5 : 0.08))
+                            .frame(width: 8, height: 8)
 
                         // Label
-                        VStack(spacing: 4) {
-                            Text(appState.tonyStarkMode ? "J.A.R.V.I.S. ONLINE" : "J.A.R.V.I.S. OFFLINE")
-                                .font(.system(size: 14, weight: .bold, design: .monospaced))
-                                .foregroundColor(appState.tonyStarkMode ? .cyan : .gray)
-                                .tracking(3)
-
-                            if appState.tonyStarkMode {
-                                Text("\"At your service, sir.\"")
-                                    .font(.system(size: 12, design: .serif))
-                                    .italic()
-                                    .foregroundColor(.cyan.opacity(0.6))
-                            }
+                        VStack {
+                            Spacer()
+                            Text(appState.tonyStarkMode ? "J.A.R.V.I.S. ONLINE" : "OFFLINE")
+                                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                .foregroundColor(.white.opacity(appState.tonyStarkMode ? 0.5 : 0.15))
+                                .tracking(2)
                         }
+                        .padding(.bottom, 20)
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 24))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(
-                            appState.tonyStarkMode ? Color.cyan.opacity(0.3) : Color.primary.opacity(0.06),
-                            lineWidth: appState.tonyStarkMode ? 2 : 1
-                        )
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(appState.tonyStarkMode ? 0.15 : 0.05), lineWidth: 1)
                 )
 
-                // Activation button
+                // Activate button
                 Button {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        appState.tonyStarkMode.toggle()
-                    }
-                    if appState.tonyStarkMode {
-                        startReactorAnimation()
-                    } else {
-                        stopReactorAnimation()
-                    }
+                    withAnimation { appState.tonyStarkMode.toggle() }
+                    if appState.tonyStarkMode { startAnimations() } else { stopAnimations() }
                 } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: appState.tonyStarkMode ? "bolt.circle.fill" : "bolt.circle")
-                            .font(.system(size: 18))
-                        Text(appState.tonyStarkMode ? "Deactivate Tony Stark Mode" : "Activate Tony Stark Mode")
-                            .font(.system(size: 15, weight: .semibold))
-                    }
-                    .foregroundColor(appState.tonyStarkMode ? .white : .red)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(appState.tonyStarkMode ? Color.red : Color.red.opacity(0.1))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
-                    )
+                    Text(appState.tonyStarkMode ? "deactivate" : "activate tony stark mode")
+                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .foregroundColor(appState.tonyStarkMode ? .white.opacity(0.5) : .black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(appState.tonyStarkMode ? Color.white.opacity(0.05) : Color.white)
+                        )
                 }
                 .buttonStyle(.plain)
 
-                // Sound preview buttons
-                Text("PREVIEW SOUNDS")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
-                    .tracking(1.5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                HStack(spacing: 12) {
-                    Button {
-                        appState.previewJarvis()
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 11))
-                            Text("J.A.R.V.I.S. Beep")
-                                .font(.system(size: 12, weight: .semibold))
-                        }
-                        .foregroundColor(.cyan)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.cyan.opacity(0.1))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.cyan.opacity(0.2), lineWidth: 1)
-                        )
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        appState.audioPlayer.playIronMan()
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 11))
-                            Text("Iron Man Theme")
-                                .font(.system(size: 12, weight: .semibold))
-                        }
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.red.opacity(0.1))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.red.opacity(0.2), lineWidth: 1)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                // Voice command status
+                // Voice status
                 if appState.tonyStarkMode {
-                    VStack(spacing: 8) {
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(appState.voiceListening ? Color.green : Color.red)
-                                .frame(width: 8, height: 8)
-                            Text(appState.voiceListening ? "Voice commands active — say \"Jarvis are you there\"" : "Voice commands off")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(appState.voiceListening ? .green : .secondary)
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(appState.voiceListening ? Color.green : Color.red)
+                            .frame(width: 6, height: 6)
+                        Text(appState.voiceListening ? "voice active — say \"jarvis are you there\"" : "voice off")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                        Spacer()
+                    }
+                    .padding(12)
+                    .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.03)))
+
+                    if !appState.lastHeardText.isEmpty {
+                        HStack(spacing: 6) {
+                            Image(systemName: "mic.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(.white.opacity(0.2))
+                            Text(appState.lastHeardText)
+                                .font(.system(size: 10, design: .monospaced))
+                                .foregroundColor(.white.opacity(0.25))
+                                .lineLimit(1)
                             Spacer()
                         }
-                        if !appState.lastHeardText.isEmpty {
-                            HStack {
-                                Image(systemName: "mic.fill")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.cyan)
-                                Text("Heard: \"\(appState.lastHeardText)\"")
-                                    .font(.system(size: 11, design: .monospaced))
-                                    .foregroundColor(.cyan.opacity(0.7))
-                                Spacer()
-                            }
-                        }
+                    }
+                }
+
+                // Preview buttons
+                HStack(spacing: 10) {
+                    Button { appState.audioPlayer.playJarvisBeep() } label: {
+                        Text("jarvis beep")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.04)))
+                    }
+                    .buttonStyle(.plain)
+
+                    Button { appState.audioPlayer.playIronMan() } label: {
+                        Text("iron man theme")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.04)))
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                // Features
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("features")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.2))
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        FeatureRow(text: "slaps play jarvis beeps instead of normal sounds")
+                        FeatureRow(text: "double-tap/clap opens terminal + claude code + iron man theme")
+                        FeatureRow(text: "say \"jarvis are you there\" to trigger the same action")
+                        FeatureRow(text: "iron man theme plays on double-clap or voice command only")
+                        FeatureRow(text: "no sound plays when you activate — only on triggers")
                     }
                     .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.primary.opacity(0.03))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(appState.voiceListening ? Color.green.opacity(0.2) : Color.primary.opacity(0.06), lineWidth: 1)
-                    )
-                }
-
-                // Feature description
-                VStack(spacing: 16) {
-                    Text("WHAT TONY STARK MODE DOES")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundColor(.secondary)
-                        .tracking(1.5)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)], spacing: 16) {
-                        FeatureCard(
-                            icon: "speaker.wave.3.fill",
-                            title: "J.A.R.V.I.S. Sounds",
-                            description: "Replaces slap sounds with sci-fi J.A.R.V.I.S. beeps and tones",
-                            color: .cyan
-                        )
-                        FeatureCard(
-                            icon: "power",
-                            title: "Iron Man Theme",
-                            description: "Plays the Iron Man soundtrack when activated or on double-clap",
-                            color: .red
-                        )
-                        FeatureCard(
-                            icon: "hands.clap.fill",
-                            title: "Double Clap",
-                            description: "Clap twice to open Terminal with Claude Code + play Iron Man theme",
-                            color: .orange
-                        )
-                        FeatureCard(
-                            icon: "mic.fill",
-                            title: "Voice Command",
-                            description: "Say \"Jarvis are you there\" to trigger Claude Code + Iron Man theme",
-                            color: .green
-                        )
-                        FeatureCard(
-                            icon: "bolt.fill",
-                            title: "Visual Mode",
-                            description: "Dashboard changes to a glowing arc reactor theme",
-                            color: .yellow
-                        )
-                    }
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.03)))
                 }
             }
-            .padding(32)
+            .padding(24)
         }
         .onAppear {
-            if appState.tonyStarkMode {
-                startReactorAnimation()
-            }
+            if appState.tonyStarkMode { startAnimations() }
         }
     }
 
-    private func startReactorAnimation() {
-        // Pulse
-        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-            arcReactorPulse = 1.1
-            arcReactorGlow = 0.5
+    private func startAnimations() {
+        withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+            pulseScale = 1.15
         }
-        // Rotate
-        withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
-            particleRotation = 360
+        withAnimation(.linear(duration: 6).repeatForever(autoreverses: false)) {
+            ringRotation = 360
         }
     }
 
-    private func stopReactorAnimation() {
+    private func stopAnimations() {
         withAnimation(.easeOut(duration: 0.3)) {
-            arcReactorPulse = 1.0
-            arcReactorGlow = 0
-            particleRotation = 0
+            pulseScale = 1.0
+            ringRotation = 0
         }
     }
 }
 
-struct FeatureCard: View {
-    let icon: String
-    let title: String
-    let description: String
-    let color: Color
-
+struct FeatureRow: View {
+    let text: String
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(color)
-            Text(title)
-                .font(.system(size: 13, weight: .semibold))
-            Text(description)
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
-                .lineSpacing(2)
+        HStack(alignment: .top, spacing: 8) {
+            Text("~")
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundColor(.white.opacity(0.15))
+            Text(text)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundColor(.white.opacity(0.35))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.primary.opacity(0.03))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
-        )
-    }
-}
-
-// Triangle shape for arc reactor core
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
-        return path
     }
 }

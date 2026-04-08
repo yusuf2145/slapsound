@@ -18,16 +18,6 @@ enum SidebarTab: String, CaseIterable, Identifiable {
         case .settings: return "gearshape.fill"
         }
     }
-
-    var color: Color {
-        switch self {
-        case .dashboard: return .blue
-        case .sounds: return .purple
-        case .keybinds: return .orange
-        case .tonyStark: return .red
-        case .settings: return .gray
-        }
-    }
 }
 
 struct ContentView: View {
@@ -37,177 +27,102 @@ struct ContentView: View {
     var body: some View {
         HStack(spacing: 0) {
             // Sidebar
-            SidebarView(selectedTab: $selectedTab)
-
-            // Divider
-            Rectangle()
-                .fill(Color.primary.opacity(0.08))
-                .frame(width: 1)
-
-            // Main content
-            ZStack {
-                Color(nsColor: .windowBackgroundColor)
-                    .ignoresSafeArea()
-
-                Group {
-                    switch selectedTab {
-                    case .dashboard:
-                        DashboardView()
-                    case .sounds:
-                        SoundsView()
-                    case .keybinds:
-                        KeyBindsView()
-                    case .tonyStark:
-                        TonyStarkView()
-                    case .settings:
-                        SettingsView()
-                    }
-                }
-                .transition(.opacity.combined(with: .move(edge: .trailing)))
-            }
-        }
-        .frame(minWidth: 900, minHeight: 640)
-    }
-}
-
-// MARK: - Sidebar
-
-struct SidebarView: View {
-    @Binding var selectedTab: SidebarTab
-    @EnvironmentObject var appState: AppState
-
-    var body: some View {
-        VStack(spacing: 0) {
-            // App logo area
-            VStack(spacing: 8) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [.orange, .red],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 48, height: 48)
-                        .shadow(color: .orange.opacity(0.3), radius: 8)
-
+            VStack(spacing: 0) {
+                // Logo
+                VStack(spacing: 6) {
                     Image(systemName: "hand.raised.fill")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.white)
-                }
 
-                Text("SlapSound")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    Text("SlapSound")
+                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
 
-                // Connection status
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(appState.isConnected ? Color.green : Color.red)
-                        .frame(width: 6, height: 6)
-                        .shadow(color: appState.isConnected ? .green.opacity(0.5) : .red.opacity(0.5), radius: 3)
-                    Text(appState.isConnected ? "Sensor Live" : "No Sensor")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding(.top, 24)
-            .padding(.bottom, 20)
-
-            Divider()
-                .padding(.horizontal, 16)
-
-            // Nav items
-            VStack(spacing: 4) {
-                ForEach(SidebarTab.allCases) { tab in
-                    SidebarButton(tab: tab, isSelected: selectedTab == tab) {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedTab = tab
-                        }
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(appState.isConnected ? Color.green : Color.red)
+                            .frame(width: 5, height: 5)
+                        Text(appState.isConnected ? "Live" : "Off")
+                            .font(.system(size: 9, weight: .medium, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
                     }
                 }
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 16)
+                .padding(.top, 28)
+                .padding(.bottom, 20)
 
-            Spacer()
-
-            // Slap counter at bottom
-            VStack(spacing: 4) {
-                Text("\(appState.slapCount)")
-                    .font(.system(size: 32, weight: .heavy, design: .rounded))
-                    .foregroundStyle(
-                        LinearGradient(colors: [.orange, .red], startPoint: .leading, endPoint: .trailing)
-                    )
-                Text("Total Slaps")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.secondary)
-            }
-            .padding(.bottom, 20)
-
-            Divider()
-                .padding(.horizontal, 16)
-
-            // Quit
-            Button {
-                NSApplication.shared.terminate(nil)
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "power")
-                        .font(.system(size: 11))
-                    Text("Quit")
-                        .font(.system(size: 11, weight: .medium))
+                // Nav
+                VStack(spacing: 2) {
+                    ForEach(SidebarTab.allCases) { tab in
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.12)) { selectedTab = tab }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: tab.icon)
+                                    .font(.system(size: 12))
+                                    .frame(width: 16)
+                                Text(tab.rawValue)
+                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                Spacer()
+                            }
+                            .foregroundColor(selectedTab == tab ? .white : .white.opacity(0.35))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(selectedTab == tab ? Color.white.opacity(0.1) : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 12)
-            .padding(.bottom, 12)
-        }
-        .frame(width: 200)
-        .background(Color.primary.opacity(0.02))
-    }
-}
-
-struct SidebarButton: View {
-    let tab: SidebarTab
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 10) {
-                Image(systemName: tab.icon)
-                    .font(.system(size: 14))
-                    .foregroundColor(isSelected ? tab.color : .secondary)
-                    .frame(width: 20)
-
-                Text(tab.rawValue)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                    .foregroundColor(isSelected ? .primary : .secondary)
+                .padding(.horizontal, 10)
 
                 Spacer()
 
-                if tab == .tonyStark {
-                    Circle()
-                        .fill(Color.red)
-                        .frame(width: 6, height: 6)
-                        .opacity(AppState.shared.tonyStarkMode ? 1 : 0)
+                // Slap count
+                VStack(spacing: 2) {
+                    Text("\(appState.slapCount)")
+                        .font(.system(size: 28, weight: .black, design: .monospaced))
+                        .foregroundColor(.white)
+                    Text("slaps")
+                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.3))
+                }
+                .padding(.bottom, 16)
+
+                // Quit
+                Button {
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    Text("Quit")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.25))
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 12)
+            }
+            .frame(width: 170)
+            .background(Color.black)
+
+            // Content
+            ZStack {
+                Color(white: 0.06).ignoresSafeArea()
+
+                Group {
+                    switch selectedTab {
+                    case .dashboard: DashboardView()
+                    case .sounds: SoundsView()
+                    case .keybinds: KeyBindsView()
+                    case .tonyStark: TonyStarkView()
+                    case .settings: SettingsView()
+                    }
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? tab.color.opacity(0.1) : Color.clear)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? tab.color.opacity(0.2) : Color.clear, lineWidth: 1)
-            )
         }
-        .buttonStyle(.plain)
+        .frame(minWidth: 860, minHeight: 580)
+        .preferredColorScheme(.dark)
     }
 }
