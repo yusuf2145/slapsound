@@ -62,6 +62,8 @@ final class AppSettings: ObservableObject {
             "themeName": "Midnight",
             "combosEnabled": true,
             "comboTimeout": 2.0,
+            "customKeyText": "",
+            "keyMode": "single",
         ])
     }
 
@@ -169,5 +171,15 @@ final class AppSettings: ObservableObject {
             return val > 0 ? val : 2.0
         }
         set { defaults.set(newValue, forKey: "comboTimeout") }
+    }
+
+    var customKeyText: String {
+        get { defaults.string(forKey: "customKeyText") ?? "" }
+        set { defaults.set(newValue, forKey: "customKeyText") }
+    }
+
+    var keyMode: String {
+        get { defaults.string(forKey: "keyMode") ?? "single" }
+        set { defaults.set(newValue, forKey: "keyMode") }
     }
 }

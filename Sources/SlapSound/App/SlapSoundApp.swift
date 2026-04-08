@@ -92,6 +92,12 @@ final class AppState: ObservableObject {
     @Published var keyBinding: KeyBinding = .key1 {
         didSet { settings.keyBinding = keyBinding }
     }
+    @Published var customKeyText: String = "" {
+        didSet { settings.customKeyText = customKeyText }
+    }
+    @Published var keyMode: String = "single" { // "single" or "text"
+        didSet { settings.keyMode = keyMode }
+    }
 
     // Speech
     @Published var speechMode: Bool = false {
@@ -165,6 +171,8 @@ final class AppState: ObservableObject {
         speechMode = settings.speechMode
         speechText = settings.speechText
         speechVoice = settings.speechVoice
+        customKeyText = settings.customKeyText
+        keyMode = settings.keyMode
         combosEnabled = settings.combosEnabled
         themeName = ThemeName(rawValue: settings.themeNameRaw) ?? .midnight
 
@@ -235,12 +243,30 @@ final class AppState: ObservableObject {
     }
 
     private func simulateKeyPress() {
-        guard keyBinding.keyCode != 0 else { return }
+        if keyMode == "text" && !customKeyText.isEmpty {
+            // Type the full string using CGEvent keyboard events
+            typeString(customKeyText)
+        } else {
+            guard keyBinding.keyCode != 0 else { return }
+            let source = CGEventSource(stateID: .hidSystemState)
+            if let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: true),
+               let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: false) {
+                keyDown.post(tap: .cghidEventTap)
+                keyUp.post(tap: .cghidEventTap)
+            }
+        }
+    }
+
+    private func typeString(_ text: String) {
         let source = CGEventSource(stateID: .hidSystemState)
-        if let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: true),
-           let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyBinding.keyCode, keyDown: false) {
-            keyDown.post(tap: .cghidEventTap)
-            keyUp.post(tap: .cghidEventTap)
+        for char in text.utf16 {
+            if let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: true),
+               let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: false) {
+                keyDown.keyboardSetUnicodeString(stringLength: 1, unicodeString: [char])
+                keyUp.keyboardSetUnicodeString(stringLength: 1, unicodeString: [char])
+                keyDown.post(tap: .cghidEventTap)
+                keyUp.post(tap: .cghidEventTap)
+            }
         }
     }
 
