@@ -31,6 +31,14 @@ struct SlapSoundApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+
+        // Set app icon from bundled .icns
+        if let iconURL = Bundle.module.url(forResource: "AppIcon", withExtension: "icns") {
+            if let icon = NSImage(contentsOf: iconURL) {
+                NSApp.applicationIconImage = icon
+            }
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             NSApp.activate(ignoringOtherApps: true)
             for window in NSApp.windows {
