@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlapSound</title>
-    <meta name="description" content="Slap your MacBook. It plays sounds. That's it.">
+    <title>SlapSound — by agaro.ai</title>
+    <meta name="description" content="Slap your MacBook. It plays sounds. That's it. A product by agaro.ai">
     <link rel="icon" href="assets/icon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -25,7 +25,6 @@
             padding: 0 24px;
         }
 
-        /* Nav */
         nav {
             padding: 20px 0;
             display: flex;
@@ -42,7 +41,6 @@
         nav a:hover { opacity: 1; }
         .nav-links { display: flex; gap: 20px; }
 
-        /* Hero */
         .hero {
             text-align: center;
             padding: 80px 0 60px;
@@ -93,7 +91,6 @@
             margin-top: 12px;
         }
 
-        /* Sections */
         .section {
             padding: 60px 0;
         }
@@ -125,7 +122,6 @@
             margin: 0;
         }
 
-        /* Sound packs */
         .sounds-list {
             list-style: none;
             margin-top: 20px;
@@ -141,16 +137,9 @@
 
         .sounds-list li:last-child { border-bottom: none; }
 
-        .sound-name {
-            font-weight: 600;
-        }
+        .sound-name { font-weight: 600; }
+        .sound-desc { font-size: 13px; opacity: 0.4; }
 
-        .sound-desc {
-            font-size: 13px;
-            opacity: 0.4;
-        }
-
-        /* Features list */
         .feature-list {
             list-style: none;
             margin-top: 20px;
@@ -166,7 +155,6 @@
             opacity: 0.3;
         }
 
-        /* Tony Stark callout */
         .tony-box {
             background: #f8f8f8;
             border-radius: 12px;
@@ -186,39 +174,37 @@
             margin-bottom: 0;
         }
 
-        /* Install code */
-        .code-block {
-            background: #1a1a1a;
-            color: #e0e0e0;
+        .install-box {
+            background: #f8f8f8;
             border-radius: 12px;
-            padding: 24px;
+            padding: 28px;
             margin-top: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            line-height: 2;
-            overflow-x: auto;
-            position: relative;
         }
 
-        .code-block .comment { color: #666; }
-        .code-block .cmd { color: #FF6B2C; }
-
-        .copy-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            border-radius: 6px;
-            padding: 4px 12px;
-            color: #888;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            cursor: pointer;
+        .install-box h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
-        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-        /* Settings preview */
+        .install-box ol {
+            padding-left: 20px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        .install-box ol li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .install-box code {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
         .setting-row {
             display: flex;
             justify-content: space-between;
@@ -228,16 +214,8 @@
         }
 
         .setting-row:last-child { border-bottom: none; }
-
-        .setting-label {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .setting-value {
-            font-size: 13px;
-            opacity: 0.4;
-        }
+        .setting-label { font-size: 14px; font-weight: 500; }
+        .setting-value { font-size: 13px; opacity: 0.4; }
 
         .slider-track {
             width: 120px;
@@ -247,11 +225,7 @@
             position: relative;
         }
 
-        .slider-fill {
-            height: 100%;
-            background: #000;
-            border-radius: 2px;
-        }
+        .slider-fill { height: 100%; background: #000; border-radius: 2px; }
 
         .slider-dot {
             width: 12px;
@@ -262,7 +236,6 @@
             top: -4px;
         }
 
-        /* FAQ */
         .faq-item {
             border-bottom: 1px solid rgba(0,0,0,0.06);
         }
@@ -277,35 +250,14 @@
             align-items: center;
         }
 
-        .faq-q::after {
-            content: "+";
-            opacity: 0.3;
-            font-size: 18px;
-        }
-
-        .faq-a {
-            font-size: 14px;
-            opacity: 0.5;
-            padding-bottom: 16px;
-            display: none;
-        }
-
+        .faq-q::after { content: "+"; opacity: 0.3; font-size: 18px; }
+        .faq-a { font-size: 14px; opacity: 0.5; padding-bottom: 16px; display: none; }
         .faq-item.open .faq-a { display: block; }
-        .faq-item.open .faq-q::after { content: "−"; }
+        .faq-item.open .faq-q::after { content: "\2212"; }
 
-        /* Pricing */
-        .price {
-            font-size: 48px;
-            font-weight: 800;
-            margin: 8px 0;
-        }
+        .price { font-size: 48px; font-weight: 800; margin: 8px 0; }
+        .price-note { font-size: 13px; opacity: 0.35; }
 
-        .price-note {
-            font-size: 13px;
-            opacity: 0.35;
-        }
-
-        /* Footer */
         footer {
             padding: 40px 0;
             text-align: center;
@@ -313,10 +265,7 @@
             opacity: 0.3;
         }
 
-        footer a {
-            color: #000;
-            text-decoration: none;
-        }
+        footer a { color: #000; text-decoration: none; }
         footer a:hover { opacity: 0.7; }
 
         .footer-links {
@@ -338,123 +287,80 @@
 
 <div class="container">
 
-    <!-- Nav -->
     <nav>
         <a href="#" style="font-weight:700;opacity:1;font-size:14px;">SlapSound</a>
         <div class="nav-links">
             <a href="#sounds">Sounds</a>
             <a href="#faq">FAQ</a>
-            <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.0-mac.zip" download>Download</a>
+            <a href="#install">Download</a>
         </div>
     </nav>
 
-    <!-- Hero -->
     <div class="hero">
         <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon">
         <h1>Slap your MacBook.<br>It plays sounds.</h1>
         <p class="tagline">That's it. That's the app.</p>
         <a href="https://github.com/yusuf2145/slapsound/releases/latest/download/SlapSound-v2.0.0-mac.zip" download class="download-btn">Download for Mac</a>
-        <p class="requirements">Requires Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
+        <p class="requirements">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
     </div>
 
     <hr class="divider">
 
-    <!-- What it does -->
     <div class="section">
         <h2>Your MacBook has an accelerometer.</h2>
-        <p>SlapSound reads it 800 times per second via IOKit HID. When you physically slap your laptop, it detects the impact and plays a sound. The harder you slap, the louder it gets.</p>
+        <p>SlapSound reads it 800 times per second. When you physically slap your laptop, it detects the impact and plays a sound. The harder you slap, the louder it gets.</p>
         <p>Whip cracks. Face slaps. Air horns. Whatever you want. Every slap also triggers a configurable key press.</p>
     </div>
 
     <hr class="divider">
 
-    <!-- Sound Packs -->
     <div class="section" id="sounds">
         <p class="label">Sound Packs</p>
         <h2>Six ways to annoy everyone.</h2>
-
         <ul class="sounds-list">
-            <li>
-                <span class="sound-name">Whip Crack</span>
-                <span class="sound-desc">the classic</span>
-            </li>
-            <li>
-                <span class="sound-name">Slap</span>
-                <span class="sound-desc">face slap</span>
-            </li>
-            <li>
-                <span class="sound-name">Punch</span>
-                <span class="sound-desc">boxing hit</span>
-            </li>
-            <li>
-                <span class="sound-name">Air Horn</span>
-                <span class="sound-desc">MLG classic</span>
-            </li>
-            <li>
-                <span class="sound-name">Sussy UwU</span>
-                <span class="sound-desc">you know what this is</span>
-            </li>
-            <li>
-                <span class="sound-name">Custom</span>
-                <span class="sound-desc">bring your own mp3</span>
-            </li>
+            <li><span class="sound-name">Whip Crack</span><span class="sound-desc">the classic</span></li>
+            <li><span class="sound-name">Slap</span><span class="sound-desc">face slap</span></li>
+            <li><span class="sound-name">Punch</span><span class="sound-desc">boxing hit</span></li>
+            <li><span class="sound-name">Air Horn</span><span class="sound-desc">MLG classic</span></li>
+            <li><span class="sound-name">Sussy UwU</span><span class="sound-desc">you know what this is</span></li>
+            <li><span class="sound-name">Custom</span><span class="sound-desc">bring your own mp3</span></li>
         </ul>
     </div>
 
     <hr class="divider">
 
-    <!-- Settings -->
     <div class="section">
         <p class="label">Customization</p>
         <h2>Dial in your slap.</h2>
-
         <div style="margin-top:20px;">
             <div class="setting-row">
                 <span class="setting-label">Sensitivity</span>
-                <div class="slider-track">
-                    <div class="slider-fill" style="width:25%;"></div>
-                    <div class="slider-dot" style="left:calc(25% - 6px);"></div>
-                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:25%;"></div><div class="slider-dot" style="left:calc(25% - 6px);"></div></div>
             </div>
-            <div class="setting-row">
-                <span class="setting-label">Cooldown</span>
-                <span class="setting-value">150ms</span>
-            </div>
+            <div class="setting-row"><span class="setting-label">Cooldown</span><span class="setting-value">150ms</span></div>
             <div class="setting-row">
                 <span class="setting-label">Volume</span>
-                <div class="slider-track">
-                    <div class="slider-fill" style="width:100%;"></div>
-                    <div class="slider-dot" style="left:calc(100% - 12px);"></div>
-                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:100%;"></div><div class="slider-dot" style="left:calc(100% - 12px);"></div></div>
             </div>
-            <div class="setting-row">
-                <span class="setting-label">Key Bind</span>
-                <span class="setting-value">1, 2, 3, Space, Return, or custom</span>
-            </div>
-            <div class="setting-row">
-                <span class="setting-label">Force Scaling</span>
-                <span class="setting-value">harder = louder + higher pitch</span>
-            </div>
+            <div class="setting-row"><span class="setting-label">Key Bind</span><span class="setting-value">1, 2, 3, Space, Return, or custom</span></div>
+            <div class="setting-row"><span class="setting-label">Force Scaling</span><span class="setting-value">harder = louder + higher pitch</span></div>
         </div>
     </div>
 
     <hr class="divider">
 
-    <!-- Tony Stark -->
     <div class="section">
         <p class="label">Special Mode</p>
         <h2>Tony Stark Mode</h2>
         <p>One toggle. Your MacBook becomes J.A.R.V.I.S.</p>
-
         <div class="tony-box">
             <h3>Double clap = magic</h3>
-            <p>When Tony Stark Mode is active, slap your MacBook twice quickly and it opens Terminal with Claude Code, plays the Iron Man soundtrack on YouTube, and triggers the J.A.R.V.I.S. startup sound. Every regular slap plays a sci-fi beep instead.</p>
+            <p>When Tony Stark Mode is active, slap your MacBook twice quickly and it opens Terminal with Claude Code, plays the Iron Man soundtrack, and triggers the J.A.R.V.I.S. startup sound. Every regular slap plays a sci-fi beep instead.</p>
         </div>
     </div>
 
     <hr class="divider">
 
-    <!-- Also does -->
     <div class="section">
         <h2>Also, it does these things.</h2>
         <ul class="feature-list">
@@ -471,28 +377,24 @@
 
     <hr class="divider">
 
-    <!-- Install -->
     <div class="section" id="install">
         <p class="label">Get Started</p>
-        <h2>Install in 30 seconds.</h2>
+        <h2>Download and run.</h2>
 
-        <div class="code-block">
-            <button class="copy-btn" onclick="copyCode()">copy</button>
-            <span class="comment"># clone</span><br>
-            <span class="cmd">git clone</span> https://github.com/yusuf2145/slapsound.git<br>
-            <span class="cmd">cd</span> slapsound<br>
-            <br>
-            <span class="comment"># build</span><br>
-            <span class="cmd">swift build</span> -c release<br>
-            <br>
-            <span class="comment"># run</span><br>
-            <span class="cmd">sudo</span> .build/release/SlapSound
+        <div class="install-box">
+            <h3>How to install</h3>
+            <ol>
+                <li>Click <strong>Download for Mac</strong> above to get the .zip file</li>
+                <li>Unzip <code>SlapSound-v2.0.0-mac.zip</code></li>
+                <li>Open Terminal and run:<br><code>sudo xattr -rd com.apple.quarantine ~/Downloads/SlapSound.app</code><br><span style="font-size:12px;opacity:0.4;">(this removes the macOS "damaged" warning for unsigned apps)</span></li>
+                <li>Then run:<br><code>sudo ~/Downloads/SlapSound.app/Contents/MacOS/SlapSound</code></li>
+                <li>Enter your Mac password. The app appears in your menu bar and opens a dashboard window.</li>
+            </ol>
         </div>
     </div>
 
     <hr class="divider">
 
-    <!-- Pricing -->
     <div class="section" style="text-align:center;">
         <p class="price">$10</p>
         <p class="price-note">One-time payment. Lifetime updates. No subscription.</p>
@@ -502,67 +404,56 @@
 
     <hr class="divider">
 
-    <!-- FAQ -->
     <div class="section" id="faq">
         <h2>FAQ</h2>
-
         <div style="margin-top:20px;">
             <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">It says "damaged" when I open it?</div>
+                <div class="faq-a">macOS quarantines apps downloaded outside the App Store. Open Terminal and run: <code>sudo xattr -rd com.apple.quarantine ~/Downloads/SlapSound.app</code> — then launch again. This is safe and normal for unsigned apps.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Why does it need sudo?</div>
-                <div class="faq-a">The MacBook's accelerometer is accessed via IOKit HID, which requires root privileges. The app only reads sensor data locally — nothing leaves your machine.</div>
+                <div class="faq-a">The MacBook's accelerometer requires root privileges to access. The app only reads sensor data locally — nothing leaves your machine.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Which Macs are supported?</div>
-                <div class="faq-a">Apple Silicon MacBooks with M1 Pro or newer. These have a built-in IMU (Bosch BMI286) accelerometer. The base M1, Mac Mini, Mac Studio, and Intel Macs don't have it.</div>
+                <div class="faq-a">Apple Silicon MacBooks with M1 Pro or newer. These have a built-in accelerometer. The base M1, Mac Mini, Mac Studio, and Intel Macs don't have it.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Will it damage my MacBook?</div>
-                <div class="faq-a">The accelerometer detects vibration — you don't need to hit hard. A firm tap on the side or trackpad area is enough. But also, slap responsibly.</div>
+                <div class="faq-a">The accelerometer detects vibration — you don't need to hit hard. A firm tap on the side or trackpad area is enough. Slap responsibly.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Can I add my own sounds?</div>
-                <div class="faq-a">Yes. Drop any .mp3, .wav, or .m4a file into Sources/SlapSound/Resources/Sounds/ and rebuild. The app loads all sound files at startup.</div>
+                <div class="faq-a">Yes. Select "Custom" in the Sounds tab and add your own .mp3 files.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">The key press isn't working?</div>
-                <div class="faq-a">Go to System Settings > Privacy & Security > Accessibility and allow Terminal (or wherever you run the app from). macOS requires permission to simulate key events.</div>
+                <div class="faq-a">Go to System Settings > Privacy & Security > Accessibility and allow Terminal. macOS requires permission to simulate key events.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">What's Tony Stark Mode?</div>
-                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap your MacBook and it opens Terminal with Claude Code and plays the Iron Man soundtrack. Yes, really.</div>
+                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap your MacBook and it opens Terminal with Claude Code and plays the Iron Man soundtrack.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Is this on the App Store?</div>
-                <div class="faq-a">No. IOKit HID access requires running outside the macOS sandbox, which the App Store doesn't allow. You build it from source.</div>
+                <div class="faq-a">No. Accelerometer access requires running outside the macOS sandbox, which the App Store doesn't allow. SlapSound is distributed directly by agaro.ai.</div>
             </div>
         </div>
     </div>
 
     <hr class="divider">
 
-    <!-- Footer -->
     <footer>
         <div class="footer-links">
             <a href="#faq">FAQ</a>
             <a href="#sounds">Sounds</a>
-            <a href="mailto:yusuf@slapsound.app">Contact</a>
+            <a href="mailto:contact@agaro.ai">Contact</a>
         </div>
-        <p>Built by Yusuf Garba</p>
+        <p>A product by <a href="https://agaro.ai" style="opacity:0.7;">agaro.ai</a></p>
     </footer>
 
 </div>
-
-<script>
-function copyCode() {
-    navigator.clipboard.writeText(`git clone https://github.com/yusuf2145/slapsound.git
-cd slapsound
-swift build -c release
-sudo .build/release/SlapSound`);
-    const b = document.querySelector('.copy-btn');
-    b.textContent = 'copied!';
-    setTimeout(() => b.textContent = 'copy', 2000);
-}
-</script>
 
 </body>
 </html>
