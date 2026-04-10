@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SlapSound — by agaro.ai</title>
-    <meta name="description" content="Slap your MacBook. It plays sounds. That's it. A product by agaro.ai">
+    <title>SlapSound — Your MacBook has never been this alive</title>
+    <meta name="description" content="Turn your MacBook into an instrument. Slap it, and it screams back. 6 sound packs, voice commands, combos, Tony Stark mode. By agaro.ai">
     <link rel="icon" href="assets/icon.jpg">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -12,18 +12,14 @@
 
         body {
             font-family: 'JetBrains Mono', monospace;
-            background: #fff;
-            color: #000;
+            background: #000;
+            color: #fff;
             -webkit-font-smoothing: antialiased;
             font-size: 15px;
             line-height: 1.7;
         }
 
-        .container {
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
+        .container { max-width: 680px; margin: 0 auto; padding: 0 24px; }
 
         nav {
             padding: 20px 0;
@@ -31,259 +27,138 @@
             justify-content: space-between;
             align-items: center;
         }
-        nav a {
-            color: #000;
-            text-decoration: none;
-            font-size: 13px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
+        nav a { color: #fff; text-decoration: none; font-size: 13px; opacity: 0.4; transition: opacity 0.2s; }
         nav a:hover { opacity: 1; }
         .nav-links { display: flex; gap: 20px; }
 
-        .hero {
-            text-align: center;
-            padding: 80px 0 60px;
-        }
+        .hero { text-align: center; padding: 100px 0 80px; }
 
         .hero-icon {
-            width: 120px;
-            height: 120px;
-            border-radius: 28px;
-            margin-bottom: 32px;
+            width: 140px; height: 140px; border-radius: 32px;
+            margin-bottom: 36px;
+            box-shadow: 0 20px 60px rgba(255,107,44,0.25);
+            cursor: pointer;
+            transition: transform 0.1s;
         }
+        .hero-icon:active { transform: scale(0.95); }
 
         .hero h1 {
-            font-size: 42px;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            margin-bottom: 16px;
+            font-size: 48px; font-weight: 800; line-height: 1.08;
+            letter-spacing: -0.03em; margin-bottom: 20px;
         }
 
-        .hero .tagline {
-            font-size: 16px;
-            opacity: 0.5;
-            font-weight: 400;
-            margin-bottom: 40px;
+        .hero .gradient {
+            background: linear-gradient(135deg, #FF6B2C, #FF2D55, #A855F7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .requirements {
-            font-size: 12px;
-            opacity: 0.35;
-            margin-top: 16px;
+        .hero .tagline { font-size: 16px; opacity: 0.4; margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; }
+
+        .buy-btn {
+            display: inline-block; background: #fff; color: #000;
+            padding: 16px 40px; border-radius: 12px;
+            text-decoration: none; font-family: 'JetBrains Mono', monospace;
+            font-size: 15px; font-weight: 700;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,255,255,0.1); }
+
+        .req { font-size: 11px; opacity: 0.2; margin-top: 14px; }
+
+        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 0; }
+
+        .section { padding: 70px 0; }
+        .section h2 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 14px; }
+        .section p { opacity: 0.4; margin-bottom: 16px; line-height: 1.8; }
+        .section .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+        .label-orange { color: #FF6B2C; }
+        .label-purple { color: #A855F7; }
+        .label-cyan { color: #00D4FF; }
+        .label-green { color: #22C55E; }
+        .label-pink { color: #EC4899; }
+
+        /* Screenshot showcase */
+        .screenshot {
+            width: 100%; border-radius: 16px; margin: 24px 0;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .section {
-            padding: 60px 0;
+        /* Features */
+        .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .feat-card {
+            padding: 20px; border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
         }
+        .feat-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .feat-card p { font-size: 12px; opacity: 0.35; margin: 0; }
+        .feat-icon { font-size: 20px; margin-bottom: 10px; display: block; }
 
-        .section h2 {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.01em;
-            margin-bottom: 12px;
+        /* Sound list */
+        .sound-list { list-style: none; margin-top: 20px; }
+        .sound-list li {
+            padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .sound-list li:last-child { border-bottom: none; }
+        .sound-name { font-weight: 600; font-size: 14px; }
+        .sound-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 10px; }
 
-        .section p {
-            opacity: 0.55;
-            margin-bottom: 16px;
-        }
-
-        .section .label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0.3;
-            margin-bottom: 8px;
-        }
-
-        .divider {
-            border: none;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            margin: 0;
-        }
-
-        .sounds-list {
-            list-style: none;
-            margin-top: 20px;
-        }
-
-        .sounds-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sounds-list li:last-child { border-bottom: none; }
-
-        .sound-name { font-weight: 600; }
-        .sound-desc { font-size: 13px; opacity: 0.4; }
-
-        .feature-list {
-            list-style: none;
-            margin-top: 20px;
-        }
-
-        .feature-list li {
-            padding: 8px 0;
-            font-size: 14px;
-        }
-
-        .feature-list li::before {
-            content: "~ ";
-            opacity: 0.3;
-        }
-
+        /* Tony box */
         .tony-box {
-            background: #f8f8f8;
-            border-radius: 12px;
-            padding: 28px;
-            margin-top: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,212,255,0.03));
+            border: 1px solid rgba(0,212,255,0.1);
+            border-radius: 16px; padding: 32px; margin-top: 20px;
         }
+        .tony-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: #00D4FF; }
+        .tony-box p { font-size: 13px; opacity: 0.4; margin: 0; line-height: 1.8; }
 
-        .tony-box h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
+        /* Combo */
+        .combo-demo {
+            text-align: center; padding: 40px 0;
         }
-
-        .tony-box p {
-            font-size: 14px;
-            opacity: 0.5;
-            margin-bottom: 0;
+        .combo-demo .num {
+            font-size: 72px; font-weight: 900; letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #FF6B2C, #A855F7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+        .combo-demo .label { font-size: 13px; opacity: 0.3; letter-spacing: 0.2em; }
 
+        /* Pricing */
+        .price-section { text-align: center; padding: 80px 0; }
+        .price { font-size: 56px; font-weight: 800; }
+        .price-note { font-size: 13px; opacity: 0.25; margin-top: 4px; }
+        .stripe-container { margin-top: 28px; }
+
+        /* Install */
         .install-box {
-            background: #f8f8f8;
-            border-radius: 12px;
-            padding: 28px;
-            margin-top: 20px;
+            background: rgba(255,255,255,0.03); border-radius: 14px;
+            padding: 28px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.06);
         }
+        .install-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+        .install-box ol { padding-left: 20px; font-size: 13px; opacity: 0.4; line-height: 2.2; }
 
-        .install-box h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .install-box ol {
-            padding-left: 20px;
-            font-size: 14px;
-            opacity: 0.6;
-        }
-
-        .install-box ol li {
-            margin-bottom: 8px;
-            line-height: 1.6;
-        }
-
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .setting-row:last-child { border-bottom: none; }
-        .setting-label { font-size: 14px; font-weight: 500; }
-        .setting-value { font-size: 13px; opacity: 0.4; }
-
-        .slider-track {
-            width: 120px;
-            height: 4px;
-            background: rgba(0,0,0,0.08);
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .slider-fill { height: 100%; background: #000; border-radius: 2px; }
-
-        .slider-dot {
-            width: 12px;
-            height: 12px;
-            background: #000;
-            border-radius: 50%;
-            position: absolute;
-            top: -4px;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
+        /* FAQ */
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.04); }
         .faq-q {
-            padding: 16px 0;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 18px 0; font-size: 14px; font-weight: 600; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
         }
-
-        .faq-q::after { content: "+"; opacity: 0.3; font-size: 18px; }
-        .faq-a { font-size: 14px; opacity: 0.5; padding-bottom: 16px; display: none; }
+        .faq-q::after { content: "+"; opacity: 0.2; font-size: 18px; }
+        .faq-a { font-size: 13px; opacity: 0.35; padding-bottom: 18px; display: none; line-height: 1.8; }
         .faq-item.open .faq-a { display: block; }
         .faq-item.open .faq-q::after { content: "\2212"; }
 
-        .price { font-size: 48px; font-weight: 800; margin: 8px 0; }
-        .price-note { font-size: 13px; opacity: 0.35; }
+        footer { padding: 40px 0; text-align: center; font-size: 11px; opacity: 0.15; }
+        footer a { color: #fff; text-decoration: none; }
+        .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 12px; }
 
-        .buy-section {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .stripe-container {
-            margin-top: 24px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .buy-btn {
-            display: inline-block;
-            background: #000;
-            color: #fff;
-            padding: 16px 40px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            font-weight: 700;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-        .buy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-        }
-
-        footer {
-            padding: 40px 0;
-            text-align: center;
-            font-size: 12px;
-            opacity: 0.3;
-        }
-
-        footer a { color: #000; text-decoration: none; }
-        footer a:hover { opacity: 0.7; }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 12px;
-        }
-
-        @media (max-width: 500px) {
-            .hero h1 { font-size: 32px; }
-            .section h2 { font-size: 22px; }
-            .hero { padding: 60px 0 40px; }
-            .section { padding: 40px 0; }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 34px; }
+            .hero { padding: 60px 0 50px; }
+            .section h2 { font-size: 24px; }
+            .feat-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -292,122 +167,146 @@
 <div class="container">
 
     <nav>
-        <a href="#" style="font-weight:700;opacity:1;font-size:14px;">SlapSound</a>
+        <a href="#" style="font-weight:700;opacity:0.8;font-size:14px;">SlapSound</a>
         <div class="nav-links">
-            <a href="#sounds">Sounds</a>
+            <a href="#features">Features</a>
             <a href="#faq">FAQ</a>
             <a href="#buy">Buy</a>
         </div>
     </nav>
 
     <div class="hero">
-        <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon" id="slap-icon" onclick="playSlap()" style="cursor:pointer;">
-        <h1>Slap your MacBook.<br>It plays sounds.</h1>
-        <p class="tagline">That's it. That's the app.</p>
-
+        <img src="assets/icon.jpg" alt="SlapSound" class="hero-icon" id="slap-icon" onclick="playSlap()">
+        <h1>Your MacBook<br>has never been<br><span class="gradient">this alive.</span></h1>
+        <p class="tagline">Slap your MacBook. It screams back. With whip cracks, air horns, voice commands, combos, and a mode that turns it into J.A.R.V.I.S.</p>
         <div class="stripe-container">
-            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Buy SlapSound — $6.77</a>
+            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Get SlapSound — $6.77</a>
         </div>
-
-        <p class="requirements">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+</p>
+        <p class="req">Apple Silicon MacBook (M1 Pro+) &middot; macOS 14+ &middot; Signed & notarized by Apple</p>
     </div>
 
     <hr class="divider">
 
     <div class="section">
-        <h2>Your MacBook has an accelerometer.</h2>
-        <p>SlapSound reads it 800 times per second. When you physically slap your laptop, it detects the impact and plays a sound. The harder you slap, the louder it gets.</p>
-        <p>Whip cracks. Face slaps. Air horns. Whatever you want. Every slap also triggers a configurable key press.</p>
+        <p class="label label-orange">How it works</p>
+        <h2>800 readings per second. Zero lag.</h2>
+        <p>Your MacBook has a hidden accelerometer. SlapSound reads it in real time via IOKit HID. When you physically hit your laptop, it detects the exact impact force and plays a sound. The harder you slap, the louder and higher-pitched it gets.</p>
+        <p>No microphone. No camera. Pure physics.</p>
     </div>
 
     <hr class="divider">
 
-    <div class="section" id="sounds">
-        <p class="label">Sound Packs</p>
-        <h2>Six ways to annoy everyone.</h2>
-        <ul class="sounds-list">
-            <li><span class="sound-name">Whip Crack</span><span class="sound-desc">the classic</span></li>
-            <li><span class="sound-name">Slap</span><span class="sound-desc">face slap</span></li>
-            <li><span class="sound-name">Punch</span><span class="sound-desc">boxing hit</span></li>
-            <li><span class="sound-name">Air Horn</span><span class="sound-desc">MLG classic</span></li>
-            <li><span class="sound-name">Sussy UwU</span><span class="sound-desc">you know what this is</span></li>
-            <li><span class="sound-name">Custom</span><span class="sound-desc">record or upload your own</span></li>
+    <div class="section" id="features">
+        <p class="label label-purple">Sound Packs</p>
+        <h2>6 built-in sounds. Or make your own.</h2>
+
+        <ul class="sound-list">
+            <li><span><span class="sound-dot" style="background:#FF6B2C;"></span><span class="sound-name">Whip Crack</span></span><span style="opacity:0.25;font-size:13px;">the OG</span></li>
+            <li><span><span class="sound-dot" style="background:#EC4899;"></span><span class="sound-name">Slap</span></span><span style="opacity:0.25;font-size:13px;">face slap</span></li>
+            <li><span><span class="sound-dot" style="background:#EF4444;"></span><span class="sound-name">Punch</span></span><span style="opacity:0.25;font-size:13px;">boxing hit</span></li>
+            <li><span><span class="sound-dot" style="background:#EAB308;"></span><span class="sound-name">Air Horn</span></span><span style="opacity:0.25;font-size:13px;">MLG classic</span></li>
+            <li><span><span class="sound-dot" style="background:#A855F7;"></span><span class="sound-name">Sussy UwU</span></span><span style="opacity:0.25;font-size:13px;">you already know</span></li>
+            <li><span><span class="sound-dot" style="background:#3B82F6;"></span><span class="sound-name">Custom</span></span><span style="opacity:0.25;font-size:13px;">record 4s or upload mp3</span></li>
         </ul>
     </div>
 
     <hr class="divider">
 
     <div class="section">
-        <p class="label">Customization</p>
-        <h2>Dial in your slap.</h2>
-        <div style="margin-top:20px;">
-            <div class="setting-row">
-                <span class="setting-label">Sensitivity</span>
-                <div class="slider-track"><div class="slider-fill" style="width:25%;"></div><div class="slider-dot" style="left:calc(25% - 6px);"></div></div>
-            </div>
-            <div class="setting-row"><span class="setting-label">Cooldown</span><span class="setting-value">150ms</span></div>
-            <div class="setting-row">
-                <span class="setting-label">Volume</span>
-                <div class="slider-track"><div class="slider-fill" style="width:100%;"></div><div class="slider-dot" style="left:calc(100% - 12px);"></div></div>
-            </div>
-            <div class="setting-row"><span class="setting-label">Key Bind</span><span class="setting-value">any key, fully customizable</span></div>
-            <div class="setting-row"><span class="setting-label">Force Scaling</span><span class="setting-value">harder = louder + higher pitch</span></div>
+        <p class="label label-green">New</p>
+        <h2>Combos. Like a fighting game.</h2>
+        <p>Slap rapidly and build combos. The counter escalates with every hit. Hit milestones and achievement banners fly across your screen.</p>
+
+        <div class="combo-demo">
+            <div class="num">10x</div>
+            <div class="label">LEGENDARY!</div>
         </div>
+
+        <p>3x TRIPLE! &middot; 5x PENTA! &middot; 10x LEGENDARY! &middot; 25x UNSTOPPABLE! &middot; 50x GOD MODE!</p>
     </div>
 
     <hr class="divider">
 
     <div class="section">
-        <p class="label">Special Mode</p>
-        <h2>Tony Stark Mode</h2>
-        <p>One toggle. Your MacBook becomes J.A.R.V.I.S.</p>
+        <p class="label label-pink">Speech & Text</p>
+        <h2>Make your Mac talk. Or type.</h2>
+        <p>Switch to Speech mode and your Mac speaks custom text aloud on every slap. Pick from built-in voices, type any sentence, or choose from 16 quick phrases. Or use Type Text mode to auto-type full sentences into any app on impact.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section">
+        <p class="label label-cyan">Tony Stark Mode</p>
+        <h2>Say "Jarvis, are you there."</h2>
+        <p>One toggle transforms your MacBook into J.A.R.V.I.S. Every slap plays a sci-fi beep. Double-clap your laptop or say the voice command — it opens Terminal with Claude Code and plays the Iron Man soundtrack. Complete with animated arc reactor.</p>
+
         <div class="tony-box">
-            <h3>Double clap or say "Jarvis are you there"</h3>
-            <p>When Tony Stark Mode is active, slap your MacBook twice quickly or say the voice command — it opens Terminal with Claude Code and plays the Iron Man soundtrack. Every regular slap plays a sci-fi beep instead.</p>
+            <h3>Triggers</h3>
+            <p>Double-clap your MacBook, or say "Jarvis are you there" out loud. Both open Terminal, launch Claude Code, and play the Iron Man theme. Voice recognition runs locally on-device.</p>
         </div>
     </div>
 
     <hr class="divider">
 
     <div class="section">
-        <h2>Also, it does these things.</h2>
-        <ul class="feature-list">
-            <li>Live dashboard with animated slap visualization</li>
-            <li>Real-time force meter and slap counter</li>
-            <li>Voice command recognition in Tony Stark Mode</li>
-            <li>Record custom 4-second sounds from your mic</li>
-            <li>Menu bar quick-access panel</li>
-            <li>Simulates any key press on impact</li>
-            <li>18+ quick-select key bindings</li>
-            <li>Preview buttons for all sounds</li>
-            <li>Persists settings between sessions</li>
-        </ul>
+        <h2>Everything else.</h2>
+        <div class="feat-grid">
+            <div class="feat-card">
+                <span class="feat-icon">&#128200;</span>
+                <h4>Slap History</h4>
+                <p>Persistent history with charts. Daily bar graph, force-over-time line chart, stats dashboard.</p>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">&#9000;</span>
+                <h4>Key Bindings</h4>
+                <p>Map any key or type full sentences on impact. 18 quick-select keys + custom recording.</p>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">&#127912;</span>
+                <h4>4 Themes</h4>
+                <p>Midnight, Neon (cyan/magenta), Sunset (orange/red), Clean (light mode). Switch instantly.</p>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">&#127911;</span>
+                <h4>Force Scaling</h4>
+                <p>Volume and pitch scale with impact force. Light taps are quiet. Hard slaps are loud.</p>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">&#127908;</span>
+                <h4>Custom Recording</h4>
+                <p>Record 4 seconds from your mic or upload any MP3/WAV file as your slap sound.</p>
+            </div>
+            <div class="feat-card">
+                <span class="feat-icon">&#9881;</span>
+                <h4>Fine Controls</h4>
+                <p>Sensitivity, cooldown, volume, combo timeout. Everything is adjustable.</p>
+            </div>
+        </div>
     </div>
 
     <hr class="divider">
 
     <div class="section" id="install">
-        <p class="label">After Purchase</p>
-        <h2>How to install.</h2>
-
+        <h2>Install in 10 seconds.</h2>
         <div class="install-box">
-            <h3>3 steps</h3>
+            <h3>After purchase:</h3>
             <ol>
-                <li>Complete payment — you'll receive a download link</li>
-                <li>Unzip the file — you'll see <strong>SlapSound.app</strong></li>
-                <li>Right-click SlapSound.app, select <strong>Open</strong>, confirm. Start slapping.</li>
+                <li>Download the DMG</li>
+                <li>Open it, drag SlapSound to Applications</li>
+                <li>Double-click to launch. Start slapping.</li>
             </ol>
         </div>
+        <p style="font-size:11px;opacity:0.2;margin-top:12px;">Signed and notarized by Apple. No Gatekeeper warnings.</p>
     </div>
 
     <hr class="divider">
 
-    <div class="buy-section" id="buy">
+    <div class="price-section" id="buy">
+        <p class="label label-orange">One-time purchase</p>
         <p class="price">$6.77</p>
-        <p class="price-note">One-time payment. Lifetime updates. No subscription.</p>
-
+        <p class="price-note">Lifetime updates. No subscription. No account needed.</p>
         <div class="stripe-container">
-            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Buy SlapSound — $6.77</a>
+            <a href="https://buy.stripe.com/3cI5kDfJbdii7PL8iG18c00" class="buy-btn">Get SlapSound</a>
         </div>
     </div>
 
@@ -418,35 +317,31 @@
         <div style="margin-top:20px;">
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">How do I get the download after paying?</div>
-                <div class="faq-a">After payment, you'll receive a download link via email. You can also access it from your Stripe receipt.</div>
+                <div class="faq-a">You'll receive a download link immediately after payment via the confirmation page and email receipt.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">macOS won't let me open it?</div>
-                <div class="faq-a">Right-click (or Control-click) the app and select "Open" instead of double-clicking. macOS will show a dialog — click "Open" to confirm. You only need to do this once.</div>
-            </div>
-            <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">Which Macs are supported?</div>
-                <div class="faq-a">Apple Silicon MacBooks with M1 Pro or newer. These have a built-in accelerometer. The base M1, Mac Mini, Mac Studio, and Intel Macs don't have it.</div>
+                <div class="faq-q">Which Macs work?</div>
+                <div class="faq-a">Apple Silicon MacBooks with M1 Pro or newer. These have the built-in accelerometer that SlapSound reads. The base M1, Mac Mini, Mac Studio, and Intel Macs don't have it.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Will it damage my MacBook?</div>
-                <div class="faq-a">The accelerometer detects vibration — you don't need to hit hard. A firm tap on the side or trackpad area is enough. Slap responsibly.</div>
-            </div>
-            <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">Can I add my own sounds?</div>
-                <div class="faq-a">Yes. Record up to 4 seconds from your mic or upload any MP3/WAV file in the Sounds tab.</div>
+                <div class="faq-a">No. The accelerometer detects vibration from a light tap. You don't need to hit hard. A firm tap on the side or trackpad area is enough.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">What's Tony Stark Mode?</div>
-                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap your MacBook or say "Jarvis are you there" to open Claude Code and play the Iron Man soundtrack.</div>
+                <div class="faq-a">It replaces all slap sounds with J.A.R.V.I.S. sci-fi beeps. Double-clap or say "Jarvis are you there" to open Terminal with Claude Code and play the Iron Man theme. Voice recognition runs locally.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Can I add my own sounds?</div>
+                <div class="faq-a">Yes. Record up to 4 seconds from your mic or upload any MP3/WAV file. Your custom sound persists across sessions.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
                 <div class="faq-q">Can I get a refund?</div>
-                <div class="faq-a">Contact us at contact@agaro.ai within 7 days of purchase for a full refund.</div>
+                <div class="faq-a">Yes. Email contact@agaro.ai within 7 days for a full refund.</div>
             </div>
             <div class="faq-item" onclick="this.classList.toggle('open')">
-                <div class="faq-q">Is this on the App Store?</div>
-                <div class="faq-a">No. Accelerometer access requires running outside the macOS sandbox, which the App Store doesn't allow. SlapSound is distributed directly by agaro.ai.</div>
+                <div class="faq-q">Is it on the App Store?</div>
+                <div class="faq-a">No. Accelerometer access requires running outside the macOS sandbox. SlapSound is distributed as a signed, Apple-notarized DMG directly from agaro.ai.</div>
             </div>
         </div>
     </div>
@@ -456,10 +351,9 @@
     <footer>
         <div class="footer-links">
             <a href="#faq">FAQ</a>
-            <a href="#sounds">Sounds</a>
             <a href="mailto:contact@agaro.ai">Contact</a>
         </div>
-        <p>A product by <a href="https://agaro.ai" style="opacity:0.7;">agaro.ai</a></p>
+        <p>A product by <a href="https://agaro.ai">agaro.ai</a></p>
     </footer>
 
 </div>
@@ -468,43 +362,22 @@
 let audioCtx;
 function playSlap() {
     const icon = document.getElementById('slap-icon');
-
-    // Shake animation
     icon.style.transition = 'transform 0.05s';
     icon.style.transform = 'scale(0.9) rotate(-5deg)';
-    setTimeout(() => {
-        icon.style.transform = 'scale(1.05) rotate(3deg)';
-        setTimeout(() => {
-            icon.style.transform = 'scale(1) rotate(0deg)';
-        }, 60);
-    }, 60);
-
-    // Generate whip crack sound with Web Audio API
+    setTimeout(() => { icon.style.transform = 'scale(1.05) rotate(3deg)'; setTimeout(() => { icon.style.transform = 'scale(1) rotate(0deg)'; }, 60); }, 60);
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const ctx = audioCtx;
-    const duration = 0.25;
-    const sampleRate = ctx.sampleRate;
-    const length = Math.floor(sampleRate * duration);
-    const buffer = ctx.createBuffer(1, length, sampleRate);
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < length; i++) {
-        const t = i / sampleRate;
-        const n = t / duration;
-        // Sharp attack, fast decay
+    const ctx = audioCtx, duration = 0.25, sr = ctx.sampleRate, len = Math.floor(sr * duration);
+    const buf = ctx.createBuffer(1, len, sr), data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+        const t = i / sr, n = t / duration;
         const env = n < 0.008 ? n / 0.008 : Math.exp(-18 * (n - 0.008));
-        // Noise + transient crack
         const noise = Math.random() * 2 - 1;
         const crack = n < 0.004 ? Math.sin(2 * Math.PI * 3000 * t) * (1 - n / 0.004) : 0;
-        const hi = Math.sin(2 * Math.PI * 5000 * t) * Math.exp(-30 * n) * 0.3;
-        data[i] = (noise * 0.6 + crack * 0.9 + hi) * env * 0.8;
+        data[i] = (noise * 0.6 + crack * 0.9) * env * 0.8;
     }
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    source.start();
+    const src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination); src.start();
 }
 </script>
+
 </body>
 </html>
